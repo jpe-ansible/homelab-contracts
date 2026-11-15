@@ -1,8 +1,12 @@
 ---
 # Converge test for the apt_cache_client role: the first converge installs
-# both files with the apps ownership and modes, a second converge rewrites
-# nothing (template tasks only, no shell), and with no explicit URL list the
-# role falls back to the published inventory's cache list.
+# both files with the apps ownership and modes, a second converge with the
+# same URL list rewrites nothing — asserted in the "Converge again" play by
+# comparing the installed files' checksums and mtimes — and with no explicit
+# URL list the role falls back to the published inventory's cache list.
+#
+# Idempotence is an assertion inside this playbook (the "Converge again"
+# play), so CI runs the playbook once; no recap grepping is needed.
 #
 # Run as ROOT — both destinations live in root-owned directories — e.g. in
 # the Debian container step in .github/workflows/ci.yml:
@@ -12,8 +16,6 @@
 #       python -m pip install --no-cache-dir "ansible-core==2.18.*"
 #       export ANSIBLE_ROLES_PATH=/workspace/ansible/roles
 #       ansible-playbook -i localhost, tests/apt_cache_client/test_converge.yml
-#       ansible-playbook -i localhost, tests/apt_cache_client/test_converge.yml
-#         | grep -E "^localhost.*changed=0"
 #     '
 #
 # Run (root): ANSIBLE_ROLES_PATH=ansible/roles ansible-playbook -i localhost, \
@@ -78,6 +80,10 @@
       - http://cache-a.example.com:3142
       - http://cache-b.example.com:3142
   tasks:
+    - name: Converge the role with the fixed list
+      ansible.builtin.include_role:
+        name: apt_cache_client
+
     - name: Snapshot the installed files
       ansible.builtin.stat:
         path: "{{ item }}"
@@ -86,7 +92,7 @@
         - /usr/local/bin/apt-proxy-detect
         - /etc/apt/apt.conf.d/00proxy
 
-    - name: Converge the role a second time
+    - name: Converge the role a second time with the same list
       ansible.builtin.include_role:
         name: apt_cache_client
 

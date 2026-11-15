@@ -10,9 +10,9 @@
 #
 # The file paths are fixed (/usr/local/bin and /etc/apt, root-owned), so
 # the render contract is asserted on the role's templates rendered in
-# place rather than on the real paths; the real converge, run twice with
-# the second reporting changed=0, is exercised by test_converge.yml in a
-# root container.
+# place rather than on the real paths; the real converge — including a
+# second converge with the same list asserted to change nothing — is
+# exercised by test_converge.yml in a root container.
 #
 # Run: ANSIBLE_ROLES_PATH=ansible/roles ansible-playbook -i localhost, \
 #        tests/apt_cache_client/test_contract.yml

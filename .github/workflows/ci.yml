@@ -219,10 +219,11 @@ jobs:
               ANSIBLE_ROLES_PATH=/workspace/ansible/roles \
                 ansible-playbook -i localhost, tests/bao_approle_cli/test_container.yml
             '
-      - name: Converge apt_cache_client twice in a Debian container
+      - name: Converge apt_cache_client in a Debian container
         # Root is required: both destinations are in root-owned directories.
-        # The second run must report changed=0 (template tasks only, no
-        # shell), which is what makes the role idempotent by construction.
+        # Idempotence is asserted inside test_converge.yml — the fixed-list
+        # play converges the role twice and checks the installed files are
+        # untouched — so the playbook runs once, no recap grepping.
         run: |
           docker run --rm \
             --volume "$PWD:/workspace:ro" \
@@ -232,8 +233,6 @@ jobs:
               python -m pip install --no-cache-dir "ansible-core==2.18.*"
               export ANSIBLE_ROLES_PATH=/workspace/ansible/roles
               ansible-playbook -i localhost, tests/apt_cache_client/test_converge.yml
-              ansible-playbook -i localhost, tests/apt_cache_client/test_converge.yml \
-                | grep -E "^localhost.*changed=0"
             '
       - name: Lint the shared roles
         run: bash .github/scripts/lint-shared-roles.sh
