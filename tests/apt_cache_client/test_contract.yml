@@ -17,7 +17,7 @@
 # Run: ANSIBLE_ROLES_PATH=ansible/roles ansible-playbook -i localhost, \
 #        tests/apt_cache_client/test_contract.yml
 
-- name: apt_cache_client contract
+- name: Contract for the apt_cache_client role
   hosts: localhost
   connection: local
   gather_facts: false
