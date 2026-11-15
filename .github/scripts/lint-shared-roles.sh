@@ -4,6 +4,7 @@ set -euo pipefail
 
 exec ansible-lint \
   ansible/roles/inventory_resolve \
+  ansible/roles/apt_cache_client \
   ansible/roles/docker_engine \
   ansible/roles/ntp \
   ansible/roles/ssh_ca_trust \

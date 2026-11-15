@@ -1,0 +1,15 @@
+---
+galaxy_info:
+  role_name: apt_cache_client
+  author: dryvist
+  description: >-
+    Shared apt cache client — installs the Acquire::http::Proxy-Auto-Detect
+    hook and the apt.conf.d drop-in so guests install packages through the
+    homelab's internal apt caches, the first live cache winning.
+  license: MIT
+  min_ansible_version: "2.16"
+  platforms:
+    - name: Debian
+      versions: [all]
+  galaxy_tags: [apt, homelab]
+dependencies: []
