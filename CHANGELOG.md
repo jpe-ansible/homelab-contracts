@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Releases are managed automatically by [release-please](https://github.com/googleapis/release-please).
 
+## [5.67.0](https://github.com/jpe-ansible/homelab-contracts/compare/v5.66.0...v5.67.0) (2026-11-15)
+
+
+### Features
+
+* **apt_cache_client:** shared apt cache client role ([#384](https://github.com/jpe-ansible/homelab-contracts/issues/384)) ([d364151](https://github.com/jpe-ansible/homelab-contracts/commit/d3641512e545f33573d862c480ee8e6d71e49469))
+* **schemas:** optional llm_gpu_accelerator on containers ([#385](https://github.com/jpe-ansible/homelab-contracts/issues/385)) ([bd95487](https://github.com/jpe-ansible/homelab-contracts/commit/bd95487f4d0c3ec783012cdcb6a27d30620f24c8))
+
 ## [5.66.0](https://github.com/jpe-ansible/homelab-contracts/compare/v5.65.0...v5.66.0) (2026-11-14)
 
 
