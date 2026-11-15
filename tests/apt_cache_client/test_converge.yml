@@ -1,0 +1,149 @@
+---
+# Converge test for the apt_cache_client role: the first converge installs
+# both files with the apps ownership and modes, a second converge with the
+# same URL list rewrites nothing — asserted in the "Converge again" play by
+# comparing the installed files' checksums and mtimes — and with no explicit
+# URL list the role falls back to the published inventory's cache list.
+#
+# Idempotence is an assertion inside this playbook (the "Converge again"
+# play), so CI runs the playbook once; no recap grepping is needed.
+#
+# Run as ROOT — both destinations live in root-owned directories — e.g. in
+# the Debian container step in .github/workflows/ci.yml:
+#
+#   docker run --rm --volume "$PWD:/workspace:ro" --workdir /workspace \
+#     python:3.13-slim bash -euc '
+#       python -m pip install --no-cache-dir "ansible-core==2.18.*"
+#       export ANSIBLE_ROLES_PATH=/workspace/ansible/roles
+#       ansible-playbook -i localhost, tests/apt_cache_client/test_converge.yml
+#     '
+#
+# Run (root): ANSIBLE_ROLES_PATH=ansible/roles ansible-playbook -i localhost, \
+#        tests/apt_cache_client/test_converge.yml
+
+- name: Converge the apt cache client
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    apt_cache_client_urls:
+      - http://cache-a.example.com:3142
+      - http://cache-b.example.com:3142
+  tasks:
+    - name: Install the hook and the drop-in
+      ansible.builtin.include_role:
+        name: apt_cache_client
+
+    - name: Stat both installed files
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      register: apt_cache_client_files
+      loop:
+        - /usr/local/bin/apt-proxy-detect
+        - /etc/apt/apt.conf.d/00proxy
+
+    - name: Both files exist with the apps ownership and modes
+      ansible.builtin.assert:
+        quiet: true
+        that:
+          - item.stat.exists
+          - item.stat.isreg
+          - item.stat.pw_name == 'root'
+          - item.stat.gr_name == 'root'
+          - >-
+            (item.stat.mode == '0755')
+            if (item.item == '/usr/local/bin/apt-proxy-detect')
+            else (item.stat.mode == '0644')
+        fail_msg: "{{ item.item }} is missing or has the wrong ownership or mode. "
+      loop: "{{ apt_cache_client_files.results }}"
+      loop_control:
+        label: "{{ item.item }}"
+
+    - name: The installed files carry the configured cache list
+      ansible.builtin.assert:
+        that:
+          - >-
+            'CACHES="http://cache-a.example.com:3142 http://cache-b.example.com:3142"'
+            in lookup('ansible.builtin.file', '/usr/local/bin/apt-proxy-detect')
+          - >-
+            'Acquire::https::Proxy-Auto-Detect "/usr/local/bin/apt-proxy-detect";'
+            in lookup('ansible.builtin.file', '/etc/apt/apt.conf.d/00proxy')
+        fail_msg: the installed files do not carry the configured cache list.
+        success_msg: hook and drop-in carry the configured cache list
+
+- name: Converge again; nothing may change
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    apt_cache_client_urls:
+      - http://cache-a.example.com:3142
+      - http://cache-b.example.com:3142
+  tasks:
+    - name: Converge the role with the fixed list
+      ansible.builtin.include_role:
+        name: apt_cache_client
+
+    - name: Snapshot the installed files
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      register: apt_cache_client_before
+      loop:
+        - /usr/local/bin/apt-proxy-detect
+        - /etc/apt/apt.conf.d/00proxy
+
+    - name: Converge the role a second time with the same list
+      ansible.builtin.include_role:
+        name: apt_cache_client
+
+    - name: Stat the installed files again
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      register: apt_cache_client_after
+      loop:
+        - /usr/local/bin/apt-proxy-detect
+        - /etc/apt/apt.conf.d/00proxy
+
+    - name: The second converge rewrote nothing
+      ansible.builtin.assert:
+        quiet: true
+        that:
+          - before.stat.checksum == after.stat.checksum
+          - before.stat.mtime == after.stat.mtime
+        fail_msg: "{{ after.item }} was rewritten by the second converge. "
+      loop: "{{ apt_cache_client_after.results }}"
+      loop_control:
+        label: "{{ after.item }}"
+        loop_var: after
+      vars:
+        before: >-
+          {{ apt_cache_client_before.results
+             | selectattr('item', 'equalto', after.item) | first }}
+
+- name: Without an explicit list, the default reads the published inventory
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Provide the published inventory's cache list as tofu_data
+      ansible.builtin.set_fact:
+        tofu_data:
+          cache_proxy_urls:
+            apt_cache:
+              - http://cache-default-a.example.com:3142
+              - http://cache-default-b.example.com:3142
+
+    - name: Converge the role without passing apt_cache_client_urls
+      ansible.builtin.include_role:
+        name: apt_cache_client
+
+    - name: The hook is configured from the default source
+      ansible.builtin.assert:
+        that:
+          - >-
+            'CACHES="http://cache-default-a.example.com:3142 http://cache-default-b.example.com:3142"'
+            in lookup('ansible.builtin.file', '/usr/local/bin/apt-proxy-detect')
+        fail_msg: >-
+          The role did not fall back to tofu_data.cache_proxy_urls.apt_cache
+          when no explicit list was passed.
+        success_msg: the default resolves from tofu_data.cache_proxy_urls.apt_cache

@@ -219,6 +219,21 @@ jobs:
               ANSIBLE_ROLES_PATH=/workspace/ansible/roles \
                 ansible-playbook -i localhost, tests/bao_approle_cli/test_container.yml
             '
+      - name: Converge apt_cache_client in a Debian container
+        # Root is required: both destinations are in root-owned directories.
+        # Idempotence is asserted inside test_converge.yml — the fixed-list
+        # play converges the role twice and checks the installed files are
+        # untouched — so the playbook runs once, no recap grepping.
+        run: |
+          docker run --rm \
+            --volume "$PWD:/workspace:ro" \
+            --workdir /workspace \
+            python:3.13-slim \
+            bash -euc '
+              python -m pip install --no-cache-dir "ansible-core==2.18.*"
+              export ANSIBLE_ROLES_PATH=/workspace/ansible/roles
+              ansible-playbook -i localhost, tests/apt_cache_client/test_converge.yml
+            '
       - name: Lint the shared roles
         run: bash .github/scripts/lint-shared-roles.sh
       # Runs here because this job already has ansible-core and the collections
@@ -237,6 +252,14 @@ jobs:
         env:
           ANSIBLE_ROLES_PATH: ansible/roles
         run: ansible-playbook -i localhost, tests/inventory_resolve/apply_owed_read_failure.yml
+      # The hook must keep the apps mechanism (first live cache wins, probe
+      # retried, logged DIRECT fallback, hook registered for http AND https)
+      # and the input must be a non-empty list of http(s) URLs. The real
+      # double converge lives in the container step above.
+      - name: Verify the apt_cache_client contract
+        env:
+          ANSIBLE_ROLES_PATH: ansible/roles
+        run: ansible-playbook -i localhost, tests/apt_cache_client/test_contract.yml
 
       - name: Verify the llm_model_catalog contract
         env:

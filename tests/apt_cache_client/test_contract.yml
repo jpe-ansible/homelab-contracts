@@ -1,0 +1,139 @@
+---
+# Contract for the apt_cache_client role.
+#
+# The Proxy-Auto-Detect hook and the apt.conf.d drop-in must keep the
+# mechanism the apps playbook shipped: first live cache wins (probed in
+# list order), the probe retried, DIRECT with a logged reason when the
+# whole pool is down, and the hook registered for BOTH the http and the
+# https apt sources. The input contract — a non-empty list of http(s)
+# URLs — is enforced by the role itself.
+#
+# The file paths are fixed (/usr/local/bin and /etc/apt, root-owned), so
+# the render contract is asserted on the role's templates rendered in
+# place rather than on the real paths; the real converge — including a
+# second converge with the same list asserted to change nothing — is
+# exercised by test_converge.yml in a root container.
+#
+# Run: ANSIBLE_ROLES_PATH=ansible/roles ansible-playbook -i localhost, \
+#        tests/apt_cache_client/test_contract.yml
+
+- name: Contract for the apt_cache_client role
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    role_dir: "{{ playbook_dir }}/../../ansible/roles/apt_cache_client"
+    apt_cache_client_urls:
+      - http://cache-a.example.com:3142
+      - http://cache-b.example.com:3142
+  tasks:
+    - name: Render the hook from the role's template
+      ansible.builtin.set_fact:
+        hook: "{{ lookup('ansible.builtin.template', role_dir ~ '/templates/apt-proxy-detect.j2') }}"
+
+    - name: Render the drop-in from the role's template
+      ansible.builtin.set_fact:
+        dropin: "{{ lookup('ansible.builtin.template', role_dir ~ '/templates/00proxy.j2') }}"
+
+    - name: The hook probes the given URLs in list order, first live wins
+      ansible.builtin.assert:
+        that:
+          - hook.splitlines()[0] == '#!/bin/bash'
+          - >-
+            'CACHES="http://cache-a.example.com:3142 http://cache-b.example.com:3142"'
+            in hook
+          - >-
+            'timeout 3 bash -c "exec 3<>/dev/tcp/${host}/${port}"' in hook
+          - >-
+            'for attempt in 1 2 3; do' in hook
+          - >-
+            '[ "$attempt" -lt 3 ] && sleep 1' in hook
+          - >-
+            'echo "$cache"' in hook
+          - >-
+            'echo DIRECT' in hook
+          - >-
+            'logger -t apt-proxy-detect -p daemon.warning' in hook
+        fail_msg: >-
+          The rendered hook dropped part of the mechanism: the URL list,
+          the connect probe, the retry loop, the first-live-wins print,
+          or the logged DIRECT fallback.
+        success_msg: the hook keeps the first-live-cache mechanism
+
+    - name: The hook derives the probe port from the URL and its scheme
+      ansible.builtin.assert:
+        that:
+          - >-
+            'port=80' in hook
+          - >-
+            'port=443' in hook
+        fail_msg: >-
+          The rendered hook lost its per-scheme probe-port handling — an
+          https entry without an explicit port would be probed on the
+          wrong port.
+        success_msg: the hook handles explicit ports and per-scheme defaults
+
+    - name: The drop-in registers the hook for the http and https sources
+      ansible.builtin.assert:
+        that:
+          - >-
+            'Acquire::http::Proxy-Auto-Detect "/usr/local/bin/apt-proxy-detect";'
+            in dropin
+          - >-
+            'Acquire::https::Proxy-Auto-Detect "/usr/local/bin/apt-proxy-detect";'
+            in dropin
+        fail_msg: >-
+          The 00proxy drop-in must register the hook for BOTH the http and
+          the https apt sources — apt sources are served over both.
+        success_msg: the drop-in registers the hook for http and https
+
+    - name: The default is driven by the published inventory's cache list
+      ansible.builtin.assert:
+        that:
+          - >-
+            'tofu_data.cache_proxy_urls.apt_cache'
+            in lookup('ansible.builtin.file', role_dir ~ '/defaults/main.yml')
+        fail_msg: >-
+          apt_cache_client_urls must default to
+          tofu_data.cache_proxy_urls.apt_cache, so a consumer that
+          resolved the inventory needs no extra variable.
+        success_msg: the default reads tofu_data.cache_proxy_urls.apt_cache
+
+    - name: Negative - an empty URL list is rejected by the role
+      vars:
+        apt_cache_client_urls: []
+      block:
+        - name: Include the role with an empty URL list
+          ansible.builtin.include_role:
+            name: apt_cache_client
+        - name: The role accepted an empty URL list
+          ansible.builtin.fail:
+            msg: The role accepted an empty URL list.
+      rescue:
+        - name: The rejection is the URL contract, not the sentinel
+          ansible.builtin.assert:
+            that: >-
+              'non-empty list of http(s) cache URLs'
+              in ansible_failed_result.msg | default('')
+              and 'accepted an empty URL list'
+              not in ansible_failed_result.msg | default('')
+
+    - name: Negative - a non-http(s) entry is rejected by the role
+      vars:
+        apt_cache_client_urls:
+          - "ftp://cache-a.example.com:3142"
+      block:
+        - name: Include the role with a non-http(s) entry
+          ansible.builtin.include_role:
+            name: apt_cache_client
+        - name: The role accepted a non-http(s) entry
+          ansible.builtin.fail:
+            msg: The role accepted a non-http(s) entry.
+      rescue:
+        - name: The rejection is the URL contract, not the sentinel
+          ansible.builtin.assert:
+            that: >-
+              'non-empty list of http(s) cache URLs'
+              in ansible_failed_result.msg | default('')
+              and 'accepted a non-http(s) entry'
+              not in ansible_failed_result.msg | default('')

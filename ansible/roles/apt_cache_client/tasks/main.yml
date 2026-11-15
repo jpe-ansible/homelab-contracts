@@ -1,0 +1,50 @@
+---
+# apt_cache_client — shared apt cache client configuration for guests.
+#
+# apt itself supports only a single Acquire::http::Proxy value, so instance
+# selection uses apt's native Proxy-Auto-Detect hook instead: at every apt run
+# the script probes each cache in apt_cache_client_urls order and prints the
+# first live one, or DIRECT so apt fails open when the whole pool is down. An
+# instance (or its node) going down therefore costs one probe timeout, never
+# apt itself.
+#
+# Template tasks only (no shell), so --check reports real changes.
+
+- name: Validate the cache URLs
+  ansible.builtin.assert:
+    that:
+      - apt_cache_client_urls is sequence
+      - apt_cache_client_urls is not string
+      - apt_cache_client_urls | length > 0
+      - >-
+        apt_cache_client_urls | map('string')
+        | select('match', '^https?://[^/ ]+')
+        | list | length == apt_cache_client_urls | length
+      # Whitespace anywhere in an entry would split the CACHES list in the
+      # hook, so reject it, not just in the scheme or the host.
+      - >-
+        apt_cache_client_urls | map('string')
+        | select('search', ' ')
+        | list | length == 0
+    fail_msg: >-
+      apt_cache_client_urls must be a non-empty list of http(s) cache URLs
+      (for example http://cache-a.example.com:3142); got
+      {{ apt_cache_client_urls }}. The default reads
+      tofu_data.cache_proxy_urls.apt_cache, so either pass the list or
+      converge an inventory that publishes it.
+
+- name: Deploy the apt proxy autodetect script
+  ansible.builtin.template:
+    src: apt-proxy-detect.j2
+    dest: /usr/local/bin/apt-proxy-detect
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Configure the apt proxy
+  ansible.builtin.template:
+    src: 00proxy.j2
+    dest: /etc/apt/apt.conf.d/00proxy
+    owner: root
+    group: root
+    mode: "0644"

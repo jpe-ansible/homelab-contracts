@@ -1,0 +1,7 @@
+---
+# Cache URLs the guest should use for apt (one entry per cache instance), in
+# the order the Proxy-Auto-Detect hook probes them: first live wins. The
+# default reads the published inventory's cache_proxy_urls.apt_cache list
+# (tofu_data, loaded by the inventory_resolve role).
+apt_cache_client_urls: >-
+  {{ tofu_data.cache_proxy_urls.apt_cache | default([]) }}

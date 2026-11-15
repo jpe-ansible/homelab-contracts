@@ -22,6 +22,9 @@ both the data shapes and the small shared tools that enforce them:
   is an opt-in `RUN_ANSIBLE_*` option, documented in the script header
 - `ansible/roles/inventory_resolve` — the shared inventory-resolution role
   consumed by the ansible repos (replaces per-repo copy-paste)
+- `ansible/roles/apt_cache_client` — the shared apt cache client (apt
+  `Proxy-Auto-Detect` hook + `apt.conf.d` drop-in) so every guest installs
+  packages through the homelab's internal apt caches, first live cache wins
 - `ansible/roles/cribl_edge` — native Cribl Edge install (tarball, `mode-edge`,
   systemd). Needed by both `ansible-proxmox-apps` (Edge containers) and
   `ansible-proxmox` (every Proxmox host), so it lives here rather than in
@@ -125,6 +128,7 @@ scripts/
   run-ansible                  # One ansible-playbook run with an OpenBao-signed SSH certificate
 ansible/
   roles/inventory_resolve/     # Shared inventory-resolution role (pin via requirements.yml)
+  roles/apt_cache_client/      # Shared apt cache client (Proxy-Auto-Detect hook + 00proxy drop-in)
   roles/cribl_edge/            # Cribl Edge install — hosts AND containers
   roles/cribl_packs/           # Versioned Cribl packs from GitHub releases
   roles/converge_gate/         # Converge wall-clock budget gate, checked between stages
