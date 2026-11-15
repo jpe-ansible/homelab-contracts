@@ -42,12 +42,18 @@
           - >-
             'CACHES="http://cache-a.example.com:3142 http://cache-b.example.com:3142"'
             in hook
-          - 'timeout 3 bash -c "exec 3<>/dev/tcp/${host}/${port}"' in hook
-          - 'for attempt in 1 2 3; do' in hook
-          - '[ "$attempt" -lt 3 ] && sleep 1' in hook
-          - 'echo "$cache"' in hook
-          - 'echo DIRECT' in hook
-          - 'logger -t apt-proxy-detect -p daemon.warning' in hook
+          - >-
+            'timeout 3 bash -c "exec 3<>/dev/tcp/${host}/${port}"' in hook
+          - >-
+            'for attempt in 1 2 3; do' in hook
+          - >-
+            '[ "$attempt" -lt 3 ] && sleep 1' in hook
+          - >-
+            'echo "$cache"' in hook
+          - >-
+            'echo DIRECT' in hook
+          - >-
+            'logger -t apt-proxy-detect -p daemon.warning' in hook
         fail_msg: >-
           The rendered hook dropped part of the mechanism: the URL list,
           the connect probe, the retry loop, the first-live-wins print,
@@ -57,8 +63,10 @@
     - name: The hook derives the probe port from the URL and its scheme
       ansible.builtin.assert:
         that:
-          - 'port=80' in hook
-          - 'port=443' in hook
+          - >-
+            'port=80' in hook
+          - >-
+            'port=443' in hook
         fail_msg: >-
           The rendered hook lost its per-scheme probe-port handling — an
           https entry without an explicit port would be probed on the
