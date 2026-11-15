@@ -17,13 +17,13 @@
       - apt_cache_client_urls is not string
       - apt_cache_client_urls | length > 0
       - >-
-        apt_cache_client_urls | map('to_text')
+        apt_cache_client_urls | map('string')
         | select('match', '^https?://[^/ ]+')
         | list | length == apt_cache_client_urls | length
       # Whitespace anywhere in an entry would split the CACHES list in the
       # hook, so reject it, not just in the scheme or the host.
       - >-
-        apt_cache_client_urls | map('to_text')
+        apt_cache_client_urls | map('string')
         | select('search', ' ')
         | list | length == 0
     fail_msg: >-

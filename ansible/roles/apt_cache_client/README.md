@@ -32,7 +32,9 @@ there fails with an empty apt reason.
 
 | Variable | Default | Meaning |
 | --- | --- | --- |
-| `apt_cache_client_urls` | `tofu_data.cache_proxy_urls.apt_cache` | the cache URLs, probed in list order, e.g. `["http://cache-a.example.com:3142", "http://cache-b.example.com:3142"]` |
+| `apt_cache_client_urls` | `tofu_data.cache_proxy_urls.apt_cache` | the cache URLs, probed in list order |
+
+e.g. `["http://cache-a.example.com:3142", "http://cache-b.example.com:3142"]`
 
 The role asserts the list is non-empty and that every entry is an http(s)
 URL. The drop-in registers the hook for both the http and the https apt
