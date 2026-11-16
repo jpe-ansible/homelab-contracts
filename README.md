@@ -59,8 +59,10 @@ deployment-json put FILE --schema SCHEMA --allow-delete NAME[,NAME...]
 The lease guarantees exclusivity, not correctness, and schema validation cannot
 see a deletion — so a file re-based off a stale working copy silently drops every
 guest added since. This is the non-empty-but-lossy sibling of the existing
-"a blank input must never plan a destroy" check. An unreadable, empty, or
-`containers`-less published object refuses rather than assuming nothing is lost.
+"a blank input must never plan a destroy" check. An unreadable or empty published
+object refuses rather than assuming nothing is lost, and a `containers`-less one
+refuses unless FILE also lacks `containers`; an absent object, or neither file having
+a `containers` key, skips the guard.
 `FLOW_LOCK_BOOTSTRAP=1` skips it, as it skips the lease.
 
 For the remaining non-IaC multi-step mutation tools, one OpenBao KV v2 lease

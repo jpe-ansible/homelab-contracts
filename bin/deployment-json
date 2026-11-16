@@ -52,7 +52,9 @@ against SCHEMA, and uploads. put validates FILE and uploads it.
 put REFUSES when any containers.* key present in the published object is
 missing from FILE, unless every vanishing key is named in --allow-delete. This
 catches a stale re-base: a file transformed from an out-of-date working copy
-silently drops every guest added since, and a schema check will not notice.
+silently drops every guest added since, and a schema check will not notice. The
+guard is skipped when the published object is absent, or when neither it nor FILE
+has a containers key.
 EOF
 }
 
@@ -103,15 +105,36 @@ validate() {
 # misses — a file re-based off a stale working copy drops every guest added
 # since, and schema validation passes it happily.
 guard_deletions() {
-  local file="$1" allow="$2" cur vanishing rc=0
+  local file="$1" allow="$2" cur vanishing rc=0 bucket key herr
   if [ "${FLOW_LOCK_BOOTSTRAP:-}" = "1" ]; then
     log "BOOTSTRAP MODE: skipping the container-deletion guard"
     return 0
   fi
+  bucket="$(sed -E 's|^s3://([^/]+)/.*|\1|' <<<"$URI")"
+  key="$(sed -E 's|^s3://[^/]+/||' <<<"$URI")"
+  # Only a 404 means the object is absent. Any other head failure still refuses.
+  herr="$(mktemp)"
+  if ! s3 s3api head-object --bucket "$bucket" --key "$key" >/dev/null 2>"$herr"; then
+    if grep -Eq '\(404\)|NoSuchKey|Not Found' "$herr"; then
+      rm -f "$herr"
+      log "no published object at $URI: nothing to delete, container-deletion guard skipped"
+      return 0
+    fi
+    cat "$herr" >&2
+    rm -f "$herr"
+    die "could not check whether $URI exists — refusing"
+  fi
+  rm -f "$herr"
   cur="$(mktemp)"
   # An unreadable or empty current object must REFUSE, never assume "deletes
   # nothing" — fetch_to dies on both.
   fetch_to "$cur"
+  # Neither object has a containers key, so there is nothing for the guard to compare.
+  if jq -e -s 'all(.[]; type == "object" and (has("containers") | not))' "$cur" "$file" >/dev/null 2>&1; then
+    rm -f "$cur"
+    log "neither the published object nor this file has a containers key: container-deletion guard skipped"
+    return 0
+  fi
   if ! jq -e '(.containers | type) == "object"' "$cur" >/dev/null 2>&1; then
     rm -f "$cur"
     die "published object has no readable .containers map — refusing (cannot prove this put deletes nothing)"

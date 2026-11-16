@@ -652,6 +652,8 @@ fake_store() {
     echo '#!/usr/bin/env bash'
     # s3() calls: aws --endpoint-url URL s3 cp SRC DEST --quiet  -> DEST is $6
     echo 'if [ "$3" = "s3" ] && [ "$4" = "cp" ]; then cp "'"$published"'" "$6"; exit 0; fi'
+    # s3api head-object fails with STUB_HEAD_ERR on stderr when it is set; otherwise the object exists
+    echo 'if [ "$3" = "s3api" ] && [ "$4" = "head-object" ] && [ -n "${STUB_HEAD_ERR:-}" ]; then printf "%s\n" "$STUB_HEAD_ERR" >&2; exit 254; fi'
     echo 'exit 0'
   } > "$STUB/aws"
   printf '#!/usr/bin/env bash\nexit 0\n' > "$STUB/check-jsonschema"
@@ -769,4 +771,49 @@ fake_store() {
   FLOW_LOCK_BOOTSTRAP=1 run "$DEPLOYMENT_JSON" put "$new" --schema "$SCHEMA"
   [ "$status" -eq 0 ]
   [[ "$output" == *"skipping the container-deletion guard"* ]]
+}
+
+@test "put skips the deletion guard when the published object is absent (404)" {
+  new="$BATS_TEST_TMPDIR/new.json"
+  echo '{"containers":{"keep":{}}}' > "$new"
+  fake_store "$BATS_TEST_TMPDIR/absent.json"
+  STUB_HEAD_ERR="An error occurred (404) when calling the HeadObject operation: Not Found" run "$DEPLOYMENT_JSON" put "$new" --schema "$SCHEMA"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"nothing to delete"* ]]
+  [[ "$output" == *"uploaded"* ]]
+}
+
+@test "put REFUSES when the existence check fails for a reason other than a 404" {
+  new="$BATS_TEST_TMPDIR/new.json"
+  echo '{"containers":{"keep":{}}}' > "$new"
+  fake_store "$BATS_TEST_TMPDIR/absent.json"
+  STUB_HEAD_ERR="An error occurred (403) when calling the HeadObject operation: Forbidden" run "$DEPLOYMENT_JSON" put "$new" --schema "$SCHEMA"
+  [ "$status" -eq 70 ]
+  [[ "$output" == *"Forbidden"* ]]
+  [[ "$output" == *"could not check whether"* ]]
+  [[ "$output" != *"uploaded"* ]]
+}
+
+@test "put skips the deletion guard when neither the published object nor the file has containers" {
+  pub="$BATS_TEST_TMPDIR/pub.json"
+  new="$BATS_TEST_TMPDIR/new.json"
+  echo '{"not_containers":1}' > "$pub"
+  echo '{"other":2}' > "$new"
+  fake_store "$pub"
+  run "$DEPLOYMENT_JSON" put "$new" --schema "$SCHEMA"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"container-deletion guard skipped"* ]]
+  [[ "$output" == *"uploaded"* ]]
+}
+
+@test "put REFUSES when the file drops a containers key the published object has" {
+  pub="$BATS_TEST_TMPDIR/pub.json"
+  new="$BATS_TEST_TMPDIR/new.json"
+  echo '{"containers":{"doomed":{}}}' > "$pub"
+  echo '{"other":2}' > "$new"
+  fake_store "$pub"
+  run "$DEPLOYMENT_JSON" put "$new" --schema "$SCHEMA"
+  [ "$status" -eq 65 ]
+  [[ "$output" == *"doomed"* ]]
+  [[ "$output" != *"uploaded"* ]]
 }
