@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Releases are managed automatically by [release-please](https://github.com/googleapis/release-please).
 
+## [5.68.0](https://github.com/jpe-ansible/homelab-contracts/compare/v5.67.0...v5.68.0) (2026-11-16)
+
+
+### Features
+
+* **agent_callers:** add the openhands gateway caller ([#387](https://github.com/jpe-ansible/homelab-contracts/issues/387)) ([de381c4](https://github.com/jpe-ansible/homelab-contracts/commit/de381c4c78f0417f239a40f380815513fe3584eb))
+
 ## [5.67.0](https://github.com/jpe-ansible/homelab-contracts/compare/v5.66.0...v5.67.0) (2026-11-15)
 
 
