@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Releases are managed automatically by [release-please](https://github.com/googleapis/release-please).
 
+## [5.71.0](https://github.com/jpe-ansible/homelab-contracts/compare/v5.70.0...v5.71.0) (2026-11-16)
+
+
+### Features
+
+* **schemas:** accept build, owned, user and version field types in the YouTrack schema ([#397](https://github.com/jpe-ansible/homelab-contracts/issues/397)) ([007d883](https://github.com/jpe-ansible/homelab-contracts/commit/007d8838d8f9609e6867e3de0d3dde48dab9a338))
+
 ## [5.70.0](https://github.com/jpe-ansible/homelab-contracts/compare/v5.69.0...v5.70.0) (2026-11-16)
 
 
