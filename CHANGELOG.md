@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Releases are managed automatically by [release-please](https://github.com/googleapis/release-please).
 
+## [5.70.0](https://github.com/jpe-ansible/homelab-contracts/compare/v5.69.0...v5.70.0) (2026-11-16)
+
+
+### Features
+
+* **schemas:** add the YouTrack declaration document schema ([#394](https://github.com/jpe-ansible/homelab-contracts/issues/394)) ([fedfbcd](https://github.com/jpe-ansible/homelab-contracts/commit/fedfbcd7dd1dbe16f1e2bca367c0eb1aaa7e268e))
+
+
+### Bug Fixes
+
+* **deployment-json:** guard a put to an object without a containers map ([#395](https://github.com/jpe-ansible/homelab-contracts/issues/395)) ([aff727a](https://github.com/jpe-ansible/homelab-contracts/commit/aff727a4d99932fb910faad0b4b84d00c14e7d6e))
+
 ## [5.69.0](https://github.com/jpe-ansible/homelab-contracts/compare/v5.68.0...v5.69.0) (2026-11-16)
 
 
