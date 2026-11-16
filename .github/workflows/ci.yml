@@ -109,6 +109,14 @@ jobs:
         run: check-jsonschema --schemafile schemas/lanes-v1.json ansible/roles/llm_roles/files/lanes.json
       - name: Validate the agent_callers registry against its schema
         run: check-jsonschema --schemafile schemas/callers-v1.json ansible/roles/agent_callers/files/callers.json
+      - name: Negative - a non-boolean gateway_key must fail the agent_callers schema
+        run: |
+          jq '.callers["sandbox-agent"].gateway_key = "false"' ansible/roles/agent_callers/files/callers.json \
+            > "$RUNNER_TEMP/callers-gateway-key-string.json"
+          if check-jsonschema --schemafile schemas/callers-v1.json "$RUNNER_TEMP/callers-gateway-key-string.json"; then
+            echo "A string gateway_key unexpectedly validated" >&2
+            exit 1
+          fi
       - name: Validate the secrets_arrangement example against its schema
         run: check-jsonschema --schemafile schemas/secrets-arrangement-v1.json examples/secrets_arrangement.json
       - name: Negative - an access word outside the vocabulary must fail the secrets arrangement schema

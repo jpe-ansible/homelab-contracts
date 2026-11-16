@@ -1,0 +1,24 @@
+---
+# Expects the role's public-caller assert to refuse _fixture_registry.
+- name: Reset the refusal marker
+  ansible.builtin.set_fact:
+    _public_caller_refused: false
+
+- name: Catch the public-caller assert refusal
+  block:
+    - name: Run the role's public-caller assert
+      ansible.builtin.include_role:
+        name: agent_callers
+        tasks_from: assert_public_callers
+      vars:
+        agent_callers_registry: "{{ _fixture_registry }}"
+  rescue:
+    - name: Record the refusal
+      ansible.builtin.set_fact:
+        _public_caller_refused: true
+
+- name: The public caller was refused
+  ansible.builtin.assert:
+    quiet: true
+    that: _public_caller_refused | bool
+    fail_msg: "A public caller without gateway_key false passed: {{ _fixture_registry }}"

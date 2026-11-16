@@ -32,3 +32,6 @@
   loop: "{{ agent_callers_registry | dict2items }}"
   loop_control:
     label: "{{ item.key }}"
+
+- name: Assert every public caller disables the gateway key
+  ansible.builtin.include_tasks: assert_public_callers.yml

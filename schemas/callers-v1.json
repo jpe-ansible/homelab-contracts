@@ -23,7 +23,8 @@
           "consumer_class": {
             "type": "string",
             "enum": ["interactive", "hermes", "ci", "batch", "untrusted"]
-          }
+          },
+          "gateway_key": { "type": "boolean" }
         }
       }
     }
