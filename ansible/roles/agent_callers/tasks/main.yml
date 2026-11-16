@@ -34,11 +34,4 @@
     label: "{{ item.key }}"
 
 - name: Assert every public caller disables the gateway key
-  ansible.builtin.assert:
-    quiet: true
-    that: item.value.gateway_key | default(true) is sameas false
-    fail_msg: Public caller {{ item.key }} must explicitly disable the gateway key.
-  loop: "{{ agent_callers_registry | dict2items }}"
-  loop_control:
-    label: "{{ item.key }}"
-  when: item.value.trust_tier == 'public'
+  ansible.builtin.include_tasks: assert_public_callers.yml

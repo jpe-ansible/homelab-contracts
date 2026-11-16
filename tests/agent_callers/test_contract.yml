@@ -78,3 +78,17 @@
       vars:
         callers: "{{ agent_callers_registry }}"
         tiers: "{{ agent_callers_tiers }}"
+
+- name: A public caller that keeps a gateway key fails the role assert
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Run the public-caller assert on fixture registries
+      ansible.builtin.include_tasks: public_caller_refused.yml
+      loop:
+        - {example-public: {trust_tier: public, consumer_class: batch}}
+        - {example-public: {trust_tier: public, consumer_class: batch, gateway_key: true}}
+        - {example-public: {trust_tier: public, consumer_class: batch, gateway_key: "false"}}
+      loop_control:
+        loop_var: _fixture_registry
