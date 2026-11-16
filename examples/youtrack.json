@@ -1,0 +1,102 @@
+{
+  "youtrack": {
+    "youtrack_url": "https://youtrack.example.com",
+    "youtrack_validate_certs": true,
+    "bundles": {
+      "bundles_enum": [
+        {
+          "name": "Priority",
+          "values": [
+            { "name": "Critical", "color_id": "1" },
+            { "name": "Normal", "color_id": "2", "description": "Default priority" }
+          ]
+        },
+        {
+          "name": "Type",
+          "values": [
+            { "name": "Bug" },
+            { "name": "Task" }
+          ]
+        }
+      ],
+      "bundles_state": [
+        {
+          "name": "State",
+          "values": [
+            { "name": "Open", "is_resolved": false },
+            { "name": "Done", "is_resolved": true, "color_id": "3" }
+          ]
+        }
+      ],
+      "bundles_version": [
+        {
+          "name": "Version",
+          "values": [
+            { "name": "1.0", "released": true, "archived": false, "release_date": 1576367999999 }
+          ]
+        }
+      ],
+      "bundles_owned": [
+        {
+          "name": "Component",
+          "values": [
+            { "name": "Core", "owner": "demo.user" }
+          ]
+        }
+      ],
+      "bundles_build": [
+        {
+          "name": "Build",
+          "values": [
+            { "name": "build-1", "assemble_date": 1627636495000 }
+          ]
+        }
+      ],
+      "bundles_user": [
+        {
+          "name": "Reviewers",
+          "users": ["demo.user"],
+          "groups": ["demo-group"]
+        }
+      ]
+    },
+    "custom_fields": {
+      "custom_fields_declared": [
+        {
+          "name": "Priority",
+          "field_type": "enum[1]",
+          "bundle": "Priority",
+          "projects": ["DEMO"],
+          "can_be_empty": false,
+          "project_overrides": [
+            { "project": "DEMO", "bundle": "Priority", "can_be_empty": true }
+          ]
+        },
+        {
+          "name": "Type",
+          "field_type": "enum[1]",
+          "bundle": "Type",
+          "projects": ["DEMO"]
+        },
+        {
+          "name": "State",
+          "field_type": "state[1]",
+          "bundle": "State",
+          "projects": ["DEMO"],
+          "can_be_empty": false
+        }
+      ]
+    },
+    "link_types": {
+      "link_types_declared": [
+        {
+          "name": "Relates",
+          "source_to_target": "Relates to",
+          "target_to_source": "Relates to",
+          "directed": false,
+          "aggregation": false
+        }
+      ]
+    }
+  }
+}

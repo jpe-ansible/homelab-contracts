@@ -101,6 +101,8 @@ jobs:
           fi
       - name: Validate nautobot_export example against schema
         run: check-jsonschema --schemafile schemas/nautobot-export-v1.json examples/nautobot_export.json
+      - name: Validate youtrack example against schema
+        run: check-jsonschema --schemafile schemas/youtrack-v1.json examples/youtrack.json
       - name: Validate the llm_roles model map against its schema
         run: check-jsonschema --schemafile schemas/model-roles-v1.json ansible/roles/llm_roles/files/model-roles.json
       - name: Validate the llm_roles lane vocabulary against its schema
