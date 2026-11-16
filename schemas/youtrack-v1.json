@@ -1,0 +1,197 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/dryvist/homelab-contracts/schemas/youtrack-v1.json",
+  "title": "dryvist YouTrack declaration document contract",
+  "description": "schema_version 1. Shape of the YouTrack declaration document: the role input of the jpe_ansible.youtrack collection at v0.5.0, without youtrack_api_key, which a document never carries. Keys and types mirror the collection's argument specs. Objects are open, so options this schema does not type still validate. bundles_enum and bundles_state are required here although the specs default them to empty lists.",
+  "type": "object",
+  "required": ["youtrack"],
+  "additionalProperties": false,
+  "properties": {
+    "youtrack": { "$ref": "#/$defs/youtrack" }
+  },
+  "$defs": {
+    "youtrack": {
+      "type": "object",
+      "required": ["youtrack_url", "bundles", "custom_fields", "link_types"],
+      "properties": {
+        "youtrack_url": { "type": "string", "pattern": "^https://\\S*[^/\\s]$" },
+        "youtrack_validate_certs": { "type": "boolean" },
+        "bundles": { "$ref": "#/$defs/bundles" },
+        "custom_fields": { "$ref": "#/$defs/customFields" },
+        "link_types": { "$ref": "#/$defs/linkTypes" }
+      }
+    },
+    "bundles": {
+      "type": "object",
+      "required": ["bundles_enum", "bundles_state"],
+      "properties": {
+        "bundles_enum": { "type": "array", "items": { "$ref": "#/$defs/enumBundle" } },
+        "bundles_state": { "type": "array", "items": { "$ref": "#/$defs/stateBundle" } },
+        "bundles_version": { "type": "array", "items": { "$ref": "#/$defs/versionBundle" } },
+        "bundles_owned": { "type": "array", "items": { "$ref": "#/$defs/ownedBundle" } },
+        "bundles_build": { "type": "array", "items": { "$ref": "#/$defs/buildBundle" } },
+        "bundles_user": { "type": "array", "items": { "$ref": "#/$defs/userBundle" } }
+      }
+    },
+    "enumBundle": {
+      "type": "object",
+      "required": ["name", "values"],
+      "properties": {
+        "name": { "type": "string" },
+        "values": { "type": "array", "items": { "$ref": "#/$defs/enumValue" } }
+      }
+    },
+    "enumValue": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string" },
+        "color_id": { "type": "string" },
+        "description": { "type": "string" }
+      }
+    },
+    "stateBundle": {
+      "type": "object",
+      "required": ["name", "values"],
+      "properties": {
+        "name": { "type": "string" },
+        "values": { "type": "array", "items": { "$ref": "#/$defs/stateValue" } }
+      }
+    },
+    "stateValue": {
+      "type": "object",
+      "required": ["name", "is_resolved"],
+      "properties": {
+        "name": { "type": "string" },
+        "is_resolved": { "type": "boolean" },
+        "color_id": { "type": "string" },
+        "description": { "type": "string" }
+      }
+    },
+    "versionBundle": {
+      "type": "object",
+      "required": ["name", "values"],
+      "properties": {
+        "name": { "type": "string" },
+        "values": { "type": "array", "items": { "$ref": "#/$defs/versionValue" } }
+      }
+    },
+    "versionValue": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string" },
+        "color_id": { "type": "string" },
+        "description": { "type": "string" },
+        "released": { "type": "boolean" },
+        "archived": { "type": "boolean" },
+        "release_date": { "type": "integer" }
+      }
+    },
+    "ownedBundle": {
+      "type": "object",
+      "required": ["name", "values"],
+      "properties": {
+        "name": { "type": "string" },
+        "values": { "type": "array", "items": { "$ref": "#/$defs/ownedValue" } }
+      }
+    },
+    "ownedValue": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string" },
+        "owner": { "type": "string" },
+        "color_id": { "type": "string" },
+        "description": { "type": "string" }
+      }
+    },
+    "buildBundle": {
+      "type": "object",
+      "required": ["name", "values"],
+      "properties": {
+        "name": { "type": "string" },
+        "values": { "type": "array", "items": { "$ref": "#/$defs/buildValue" } }
+      }
+    },
+    "buildValue": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string" },
+        "color_id": { "type": "string" },
+        "description": { "type": "string" },
+        "assemble_date": { "type": "integer" }
+      }
+    },
+    "userBundle": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": { "type": "string" },
+        "users": { "type": "array", "items": { "type": "string" } },
+        "groups": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "customFields": {
+      "type": "object",
+      "required": ["custom_fields_declared"],
+      "properties": {
+        "custom_fields_declared": { "type": "array", "items": { "$ref": "#/$defs/customField" } }
+      }
+    },
+    "customField": {
+      "type": "object",
+      "required": ["name", "field_type"],
+      "properties": {
+        "name": { "type": "string" },
+        "field_type": {
+          "type": "string",
+          "enum": [
+            "string",
+            "text",
+            "integer",
+            "float",
+            "date",
+            "date and time",
+            "period",
+            "enum[1]",
+            "enum[*]",
+            "state[1]"
+          ]
+        },
+        "bundle": { "type": "string" },
+        "projects": { "type": "array", "items": { "type": "string" } },
+        "can_be_empty": { "type": "boolean" },
+        "project_overrides": { "type": "array", "items": { "$ref": "#/$defs/projectOverride" } }
+      }
+    },
+    "projectOverride": {
+      "type": "object",
+      "required": ["project"],
+      "properties": {
+        "project": { "type": "string" },
+        "bundle": { "type": "string" },
+        "can_be_empty": { "type": "boolean" }
+      }
+    },
+    "linkTypes": {
+      "type": "object",
+      "required": ["link_types_declared"],
+      "properties": {
+        "link_types_declared": { "type": "array", "items": { "$ref": "#/$defs/linkType" } }
+      }
+    },
+    "linkType": {
+      "type": "object",
+      "required": ["name", "source_to_target", "target_to_source"],
+      "properties": {
+        "name": { "type": "string" },
+        "source_to_target": { "type": "string" },
+        "target_to_source": { "type": "string" },
+        "directed": { "type": "boolean" },
+        "aggregation": { "type": "boolean" }
+      }
+    }
+  }
+}
