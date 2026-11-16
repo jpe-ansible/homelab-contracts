@@ -206,6 +206,10 @@ jobs:
         env:
           ANSIBLE_ROLES_PATH: ansible/roles
         run: ansible-playbook -i localhost, tests/agent_callers/test_contract.yml
+      - name: Verify the secret_path filter contract
+        env:
+          ANSIBLE_FILTER_PLUGINS: ansible/plugins/filter
+        run: ansible-playbook -i localhost, tests/secret_path/test_contract.yml
       # converge_gate contract: the cap this role enforces must always sit
       # strictly below whatever ceiling fed it (the Semaphore-forwarded env
       # var, or the one fallback default), and a CONVERGE_WALL_CLOCK_CAP

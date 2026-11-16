@@ -28,6 +28,7 @@ This directory is the collection root: `galaxy.yml` sits beside `roles/`.
 | Plugin | Type | Purpose | Consumers |
 | --- | --- | --- | --- |
 | `converge_telemetry` | callback | Ship per-host converge-freshness and per-task timing events to Splunk HEC | `ansible-proxmox-ai` |
+| `secret_path` | filter | Build validated logical and KV v2 paths from named components | Collection consumers |
 
 ## Installation
 
