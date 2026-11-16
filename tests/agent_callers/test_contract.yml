@@ -25,6 +25,7 @@
           - "'public' in agent_callers_tiers"
           - agent_callers_registry['sandbox-agent']['trust_tier'] == 'public'
           - agent_callers_registry['sandbox-agent']['consumer_class'] == 'batch'
+          - agent_callers_registry['sandbox-agent']['gateway_key'] == false
           - >-
             (agent_callers_registry | dict2items | map(attribute='key') | unique | list | length)
             == (agent_callers_registry | length)
@@ -52,6 +53,25 @@
       loop: "{{ agent_callers_registry | dict2items }}"
       loop_control:
         label: "{{ item.key }}"
+
+    - name: Callers without gateway_key default to true
+      ansible.builtin.assert:
+        quiet: true
+        that: item.value.gateway_key | default(true) == true
+      loop: "{{ agent_callers_registry | dict2items }}"
+      loop_control:
+        label: "{{ item.key }}"
+      when: item.value.gateway_key is not defined
+
+    - name: Every public caller explicitly disables the gateway key
+      ansible.builtin.assert:
+        quiet: true
+        that: item.value.gateway_key | default(true) is sameas false
+        fail_msg: Public caller {{ item.key }} must explicitly disable the gateway key.
+      loop: "{{ agent_callers_registry | dict2items }}"
+      loop_control:
+        label: "{{ item.key }}"
+      when: item.value.trust_tier == 'public'
 
     - name: The shipped caller tiers resolve
       ansible.builtin.include_tasks: check_refs.yml

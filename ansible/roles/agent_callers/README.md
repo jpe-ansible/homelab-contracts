@@ -16,3 +16,7 @@ The `public` tier is for a caller that only ever handles public content, such as
 sandbox that works on public repositories. A consumer may give that tier routes that
 retain prompts; it never grants it what `trusted` holds, and a consumer that tests
 for `trusted` treats `public` like any other non-trusted tier.
+
+`gateway_key` defaults to `true`; `false` means the caller holds no agentgateway
+key, so the consumer seeds no gateway-key secret leaf for it and gives it no
+gateway routes or memory bank. Every public-tier caller must set it to `false`.
