@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Releases are managed automatically by [release-please](https://github.com/googleapis/release-please).
 
+## [5.69.0](https://github.com/jpe-ansible/homelab-contracts/compare/v5.68.0...v5.69.0) (2026-11-16)
+
+
+### Features
+
+* **secrets:** add a filter that builds a secret path from its parts ([#390](https://github.com/jpe-ansible/homelab-contracts/issues/390)) ([ec510eb](https://github.com/jpe-ansible/homelab-contracts/commit/ec510eb44aa2ea911978782cdae072f9601e0694))
+
 ## [5.68.0](https://github.com/jpe-ansible/homelab-contracts/compare/v5.67.0...v5.68.0) (2026-11-16)
 
 
