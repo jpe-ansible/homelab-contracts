@@ -13,6 +13,7 @@
     "opencode-untrusted": {"trust_tier": "untrusted", "consumer_class": "untrusted"},
     "claude-zai": {"trust_tier": "untrusted", "consumer_class": "untrusted"},
     "zcode": {"trust_tier": "untrusted", "consumer_class": "untrusted"},
+    "openhands": {"trust_tier": "untrusted", "consumer_class": "untrusted"},
     "antigravity-cli": {"trust_tier": "trusted", "consumer_class": "interactive"}
   }
 }
