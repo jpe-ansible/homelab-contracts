@@ -1,0 +1,247 @@
+---
+# Requires ANSIBLE_FILTER_PLUGINS=ansible/plugins/filter to load secret_path from this checkout.
+- name: Secret path filter contract
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    ordinary_secret:
+      zone: int
+      service: example-app
+      instance: main
+      access: ro
+    admin_secret:
+      zone: ext-saas
+      service: example-app
+      instance: main
+      scope: owner
+    config_path:
+      config: true
+      service: example-app
+      instance: main
+    ordinary_logical: "{{ ordinary_secret | secret_path }}"
+    admin_logical: "{{ admin_secret | secret_path }}"
+    config_logical: "{{ config_path | secret_path }}"
+    grant_path_patterns: >-
+      {{
+        (lookup('ansible.builtin.file', '../../schemas/secrets-arrangement-v1.json') | from_json)['$defs']['grantPath']['oneOf']
+        | map(attribute='pattern') | list
+      }}
+    secret_path_form: logical
+  tasks:
+    - name: Build every ordinary secret path form
+      ansible.builtin.assert:
+        that:
+          - (ordinary_secret | secret_path) == 'int/example-app/main/ro'
+          - (ordinary_secret | secret_path(form='mount')) == 'int'
+          - (ordinary_secret | secret_path(form='path')) == 'example-app/main/ro'
+          - (ordinary_secret | secret_path(form='data')) == 'int/data/example-app/main/ro'
+          - >-
+            (ordinary_secret | secret_path(form='metadata'))
+            == 'int/metadata/example-app/main/ro'
+
+    - name: Build every admin secret path form
+      ansible.builtin.assert:
+        that:
+          - (admin_secret | secret_path) == 'admin/ext-saas/example-app/main/owner'
+          - (admin_secret | secret_path(form='mount')) == 'admin'
+          - (admin_secret | secret_path(form='path')) == 'ext-saas/example-app/main/owner'
+          - >-
+            (admin_secret | secret_path(form='data'))
+            == 'admin/data/ext-saas/example-app/main/owner'
+          - >-
+            (admin_secret | secret_path(form='metadata'))
+            == 'admin/metadata/ext-saas/example-app/main/owner'
+
+    - name: Build every config path form
+      ansible.builtin.assert:
+        that:
+          - (config_path | secret_path) == 'config/example-app/main'
+          - (config_path | secret_path(form='mount')) == 'config'
+          - (config_path | secret_path(form='path')) == 'example-app/main'
+          - (config_path | secret_path(form='data')) == 'config/data/example-app/main'
+          - >-
+            (config_path | secret_path(form='metadata'))
+            == 'config/metadata/example-app/main'
+
+    - name: The logical examples match a grantPath pattern from the schema
+      ansible.builtin.assert:
+        that:
+          - >-
+            ordinary_logical is match(grant_path_patterns[0])
+            or ordinary_logical is match(grant_path_patterns[1])
+            or ordinary_logical is match(grant_path_patterns[2])
+          - >-
+            admin_logical is match(grant_path_patterns[0])
+            or admin_logical is match(grant_path_patterns[1])
+            or admin_logical is match(grant_path_patterns[2])
+          - >-
+            config_logical is match(grant_path_patterns[0])
+            or config_logical is match(grant_path_patterns[1])
+            or config_logical is match(grant_path_patterns[2])
+
+    - name: Reject an unknown input key
+      vars:
+        bad_input:
+          zone: int
+          service: example-app
+          instance: main
+          access: ro
+          unexpected: unused
+        expected_key: unexpected
+        expected_rule: unknown input key
+      block: &reject_invalid_input
+        - name: Evaluate the invalid input
+          ansible.builtin.set_fact:
+            rejected_path: "{{ bad_input | secret_path(form=secret_path_form) }}"
+        - name: Fail if the invalid input was accepted
+          ansible.builtin.fail:
+            msg: secret_path accepted invalid input
+      rescue: &check_rejection
+        - name: Check the filter error names the offending key and rule
+          ansible.builtin.assert:
+            that:
+              - expected_key in (ansible_failed_result.msg | default(''))
+              - expected_rule in (ansible_failed_result.msg | default(''))
+              - "'secret_path accepted invalid input' not in (ansible_failed_result.msg | default(''))"
+
+    - name: Reject both access and scope
+      vars:
+        bad_input:
+          zone: int
+          service: example-app
+          instance: main
+          access: ro
+          scope: owner
+        expected_key: access and scope
+        expected_rule: exactly one
+      block: *reject_invalid_input
+      rescue: *check_rejection
+
+    - name: Reject neither access nor scope
+      vars:
+        bad_input:
+          zone: int
+          service: example-app
+          instance: main
+        expected_key: access or scope
+        expected_rule: exactly one
+      block: *reject_invalid_input
+      rescue: *check_rejection
+
+    - name: Reject an access value outside the allowed set
+      vars:
+        bad_input:
+          zone: int
+          service: example-app
+          instance: main
+          access: owner
+        expected_key: access
+        expected_rule: one of ro, rw, or self
+      block: *reject_invalid_input
+      rescue: *check_rejection
+
+    - name: Reject a scope value outside the allowed set
+      vars:
+        bad_input:
+          zone: int
+          service: example-app
+          instance: main
+          scope: superuser
+        expected_key: scope
+        expected_rule: one of admin, management, owner, or root
+      block: *reject_invalid_input
+      rescue: *check_rejection
+
+    - name: Reject a reserved zone name
+      vars:
+        bad_input:
+          zone: admin
+          service: example-app
+          instance: main
+          access: ro
+        expected_key: zone
+        expected_rule: must not be a reserved mount name
+      block: *reject_invalid_input
+      rescue: *check_rejection
+
+    - name: Reject an uppercase segment
+      vars:
+        bad_input:
+          zone: int
+          service: Example-app
+          instance: main
+          access: ro
+        expected_key: service
+        expected_rule: segment pattern
+      block: *reject_invalid_input
+      rescue: *check_rejection
+
+    - name: Reject a segment containing a slash
+      vars:
+        bad_input:
+          zone: int
+          service: example/app
+          instance: main
+          access: ro
+        expected_key: service
+        expected_rule: segment pattern
+      block: *reject_invalid_input
+      rescue: *check_rejection
+
+    - name: Reject a plus segment
+      vars:
+        bad_input:
+          zone: int
+          service: +
+          instance: main
+          access: ro
+        expected_key: service
+        expected_rule: segment pattern
+      block: *reject_invalid_input
+      rescue: *check_rejection
+
+    - name: Reject an empty segment
+      vars:
+        bad_input:
+          zone: int
+          service: ''
+          instance: main
+          access: ro
+        expected_key: service
+        expected_rule: segment pattern
+      block: *reject_invalid_input
+      rescue: *check_rejection
+
+    - name: Reject a non-string segment
+      vars:
+        bad_input:
+          zone: int
+          service: 1
+          instance: main
+          access: ro
+        expected_key: service
+        expected_rule: segment pattern
+      block: *reject_invalid_input
+      rescue: *check_rejection
+
+    - name: Reject config input with a zone
+      vars:
+        bad_input:
+          config: true
+          zone: int
+          service: example-app
+          instance: main
+        expected_key: zone
+        expected_rule: config paths accept only
+      block: *reject_invalid_input
+      rescue: *check_rejection
+
+    - name: Reject an unknown output form
+      vars:
+        bad_input: "{{ ordinary_secret }}"
+        secret_path_form: unsupported
+        expected_key: form
+        expected_rule: one of logical, mount, path, data, or metadata
+      block: *reject_invalid_input
+      rescue: *check_rejection
