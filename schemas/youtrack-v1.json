@@ -13,6 +13,7 @@
     "youtrack": {
       "type": "object",
       "required": ["youtrack_url", "bundles", "custom_fields", "link_types"],
+      "not": { "required": ["youtrack_api_key"] },
       "properties": {
         "youtrack_url": { "type": "string", "pattern": "^https://\\S*[^/\\s]$" },
         "youtrack_validate_certs": { "type": "boolean" },
