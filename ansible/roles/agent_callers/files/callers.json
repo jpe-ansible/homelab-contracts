@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "description": "Harness gateway identities, trust tiers, and consumer classes; consumers read this file, and deployment JSON may override trust_tier per id.",
-  "tiers": ["trusted", "untrusted"],
+  "tiers": ["trusted", "public", "untrusted"],
   "default_tier": "untrusted",
   "callers": {
     "claude-code": {"trust_tier": "trusted", "consumer_class": "interactive"},
@@ -14,6 +14,7 @@
     "claude-zai": {"trust_tier": "untrusted", "consumer_class": "untrusted"},
     "zcode": {"trust_tier": "untrusted", "consumer_class": "untrusted"},
     "openhands": {"trust_tier": "untrusted", "consumer_class": "untrusted"},
+    "sandbox-agent": {"trust_tier": "public", "consumer_class": "batch"},
     "antigravity-cli": {"trust_tier": "trusted", "consumer_class": "interactive"}
   }
 }
