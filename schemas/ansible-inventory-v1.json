@@ -298,6 +298,23 @@
           "enum": ["trusted", "untrusted"],
           "description": "Trust tier from the shared agent caller trust vocabulary. Optional for legacy physical owners; required for logical owners."
         },
+        "a2a_url": {
+          "type": "string",
+          "pattern": "^https?://[^/\\s]+(/\\S*)?$",
+          "description": "The agent's native A2A (agent-to-agent) endpoint. Present only for an agent that serves A2A."
+        },
+        "a2a_callers": {
+          "type": "array",
+          "description": "Ids allowed to call this agent over A2A.",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "a2a_peers": {
+          "type": "array",
+          "description": "Ids this agent may call over A2A.",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
         "owns": {
           "type": "array",
           "description": "Tool-domain or service slugs owned by this agent. Ownership is unique across all agents; specializations share this owner's envelope and do not create additional ownership entries.",
