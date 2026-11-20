@@ -14,7 +14,10 @@
         { "name": "github-audit", "description": "Audits repository configuration." },
         { "name": "openbao-operations", "description": "Uses OpenBao contract tools." }
       ],
-      "router_key_class": "standard"
+      "router_key_class": "standard",
+      "a2a_url": "http://alpha-agent.example.test/a2a/",
+      "a2a_callers": ["beta-agent"],
+      "a2a_peers": ["beta-agent"]
     },
     "beta-agent": {
       "container": "beta-agent",
