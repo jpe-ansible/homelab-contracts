@@ -87,6 +87,14 @@ without role assignments. Shared defaults cannot supply model-specific scores.
 * [OpenDecider Nano](manjunathshiva-opendecider-nano.md) - Catalog artifact evidence.
 * [Nemotron 3.5 Bolt BF16](nvidia-NVIDIA-Nemotron-3-5-Bolt-74B-A9B-BF16.md)
   Catalog artifact evidence.
+* [Gemma 4 12B IT](google-gemma-4-12B-it.md)
+  Catalog artifact evidence (MLX 4-bit build).
+* [Qwen3-ASR-1.7B](Qwen-Qwen3-ASR-1-7B.md)
+  Catalog artifact evidence (MLX 8-bit build).
+* [Ming-3.0-tts-0.5B](inclusionAI-Ming-3-0-tts-0-5B.md)
+  Catalog artifact evidence (MLX 8-bit build).
+* [Inkling 2 Mini](thinkingmachines-Inkling-2-Mini.md)
+  Catalog artifact evidence (MLX 4-bit build).
 
 ## Shared evidence
 
