@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Releases are managed automatically by [release-please](https://github.com/googleapis/release-please).
 
+## [5.76.0](https://github.com/jpe-ansible/homelab-contracts/compare/v5.75.0...v5.76.0) (2026-11-23)
+
+
+### Features
+
+* **llm-model-catalog:** add GPU speech and MiMo GGUF records ([#411](https://github.com/jpe-ansible/homelab-contracts/issues/411)) ([49e82d4](https://github.com/jpe-ansible/homelab-contracts/commit/49e82d4da15adafeb7744dad05d9d41c85abbaa5))
+
 ## [5.75.0](https://github.com/jpe-ansible/homelab-contracts/compare/v5.74.0...v5.75.0) (2026-11-23)
 
 
