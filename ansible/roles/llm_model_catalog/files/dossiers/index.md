@@ -80,13 +80,21 @@ without role assignments. Shared defaults cannot supply model-specific scores.
 * [Qwen3.6-35B-A3B](Qwen-Qwen3-6-35B-A3B.md) - Catalog artifact evidence.
 * [Qwen3.8-27B](Qwen-Qwen3-8-27B.md) - Catalog artifact evidence.
 * [MiMo V2.6 Distill Qwen 9B](XiaomiMiMo-MiMo-V2-6-Distill-Qwen-9B.md)
-  Catalog artifact evidence.
+  Catalog artifact evidence (MLX 4-bit and bartowski Q4_K_M GGUF builds).
 * [Unlimited OCR](baidu-Unlimited-OCR.md) - Catalog artifact evidence.
 * [Laya typed decisions](convaiinnovations-laya-typed-decisions.md)
   Catalog artifact evidence.
 * [OpenDecider Nano](manjunathshiva-opendecider-nano.md) - Catalog artifact evidence.
 * [Nemotron 3.5 Bolt BF16](nvidia-NVIDIA-Nemotron-3-5-Bolt-74B-A9B-BF16.md)
   Catalog artifact evidence.
+* [Gemma 4 12B IT](google-gemma-4-12B-it.md)
+  Catalog artifact evidence (MLX 4-bit build).
+* [Qwen3-ASR-1.7B](Qwen-Qwen3-ASR-1-7B.md)
+  Catalog artifact evidence (MLX 8-bit and audio.cpp Q8_0 builds).
+* [Ming-3.0-tts-0.5B](inclusionAI-Ming-3-0-tts-0-5B.md)
+  Catalog artifact evidence (MLX 8-bit and audio.cpp Q8_0 builds).
+* [Inkling 2 Mini](thinkingmachines-Inkling-2-Mini.md)
+  Catalog artifact evidence (MLX 4-bit build).
 
 ## Shared evidence
 

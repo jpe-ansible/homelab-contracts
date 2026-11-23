@@ -2,25 +2,26 @@
 type: Model Dossier
 title: "XiaomiMiMo/MiMo-V2.6-Distill-Qwen-9B"
 description: "Upstream and artifact evidence for the shared model policy."
-timestamp: "2026-11-06T00:00:00Z"
+timestamp: "2026-11-22T00:00:00Z"
 status: started
 ---
 
 ## 1. Upstream evidence
 
-- Observed: 2026-11-06. [Hub metadata](https://huggingface.co/api/models/XiaomiMiMo/MiMo-V2.6-Distill-Qwen-9B).
+- Observed: 2026-11-22. [Hub metadata](https://huggingface.co/api/models/XiaomiMiMo/MiMo-V2.6-Distill-Qwen-9B).
 - Upstream repository created: 2026-09-21 (Hub `createdAt`).
   Release date: UNVERIFIED. Conversion dates do not renew upstream age.
 - Upstream creation or release date: 2026-09-21T18:18:40.000Z (`createdAt`),
   [Hub API](https://huggingface.co/api/models/XiaomiMiMo/MiMo-V2.6-Distill-Qwen-9B),
-  observed 2026-11-06.
+  observed 2026-11-22.
 - Observed immutable upstream revision: `1f09ddcc1a0ea45751ae0dfe2af20d533168c46f`.
   [Pinned upstream card](https://huggingface.co/XiaomiMiMo/MiMo-V2.6-Distill-Qwen-9B/blob/1f09ddcc1a0ea45751ae0dfe2af20d533168c46f/README.md).
 - License: mit. [License evidence](https://huggingface.co/XiaomiMiMo/MiMo-V2.6-Distill-Qwen-9B/tree/1f09ddcc1a0ea45751ae0dfe2af20d533168c46f).
   Additional restrictions: UNVERIFIED.
 - Architecture: Qwen3_5ForConditionalGeneration.
 - Intended task: Classification, evaluation, and summarization.
-- Role-assigned artifacts: `mlx-community/MiMo-V2.6-Distill-Qwen-9B-OptiQ-4bit`.
+- Role-assigned artifacts: `mlx-community/MiMo-V2.6-Distill-Qwen-9B-OptiQ-4bit`
+  and `bartowski/MiMo-V2.6-Distill-Qwen-9B-GGUF`.
 
 ## 4. Evaluation and comparison
 
@@ -60,3 +61,31 @@ status: started
   - `model-00002-of-00002.safetensors`: 1751328472 bytes.
 - Listed weight total: 7100710126 bytes
   (6.61 GiB).
+
+### bartowski/MiMo-V2.6-Distill-Qwen-9B-GGUF
+
+- Artifact metadata: [Hugging Face API](https://huggingface.co/api/models/bartowski/MiMo-V2.6-Distill-Qwen-9B-GGUF?blobs=true),
+  observed 2026-11-22.
+- Artifact repository: `bartowski/MiMo-V2.6-Distill-Qwen-9B-GGUF`.
+- Artifact publisher: `bartowski` (`author`); the publisher card identifies
+  `XiaomiMiMo/MiMo-V2.6-Distill-Qwen-9B` as the base model.
+- Immutable artifact revision: `4371da10c84fb26da3592d4cf312d24aa82b7b65` (`sha`).
+  [Pinned artifact commit](https://huggingface.co/bartowski/MiMo-V2.6-Distill-Qwen-9B-GGUF/commit/4371da10c84fb26da3592d4cf312d24aa82b7b65).
+- Artifact created date: 2026-09-21 (Hub commit date).
+- Evidence observed date: 2026-11-22,
+  [Hub API](https://huggingface.co/api/models/bartowski/MiMo-V2.6-Distill-Qwen-9B-GGUF?blobs=true).
+- Filename and bytes: `MiMo-V2.6-Distill-Qwen-9B-Q4_K_M.gguf`,
+  5841049120 bytes. SHA256: `4bca6f18c73f72270c7a20c2ea2bea581de8246e318714277120369d34048c81`,
+  from the Xet pointer at the pinned artifact revision.
+  [Pinned file page][mimo-gguf-file].
+- Quantization recipe: GGUF `Q4_K_M`, built with llama.cpp b10964 using a
+  publisher-provided per-tensor layout and imatrix,
+  [pinned publisher card](https://huggingface.co/bartowski/MiMo-V2.6-Distill-Qwen-9B-GGUF/blob/4371da10c84fb26da3592d4cf312d24aa82b7b65/README.md).
+- Calibration provenance: the publisher card identifies its calibration
+  corpus as `MiMo-V2.6-Distill-Qwen-9B-calibration-v6.txt` and publishes the
+  corresponding `MiMo-V2.6-Distill-Qwen-9B-imatrix.gguf`,
+  [pinned publisher card](https://huggingface.co/bartowski/MiMo-V2.6-Distill-Qwen-9B-GGUF/blob/4371da10c84fb26da3592d4cf312d24aa82b7b65/README.md).
+- Upstream source revision: `1f09ddcc1a0ea45751ae0dfe2af20d533168c46f`.
+- Listed file matches the observed artifact revision.
+
+[mimo-gguf-file]: https://huggingface.co/bartowski/MiMo-V2.6-Distill-Qwen-9B-GGUF/blob/4371da10c84fb26da3592d4cf312d24aa82b7b65/MiMo-V2.6-Distill-Qwen-9B-Q4_K_M.gguf

@@ -5,6 +5,41 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Releases are managed automatically by [release-please](https://github.com/googleapis/release-please).
 
+## [5.77.0](https://github.com/jpe-ansible/homelab-contracts/compare/v5.76.0...v5.77.0) (2026-11-23)
+
+
+### Features
+
+* **agent_callers:** add the litellm-local-workstation caller to the public tier ([#413](https://github.com/jpe-ansible/homelab-contracts/issues/413)) ([702fd09](https://github.com/jpe-ansible/homelab-contracts/commit/702fd09659f78ed11f78044ce4c35e6d5ac56533))
+
+## [5.76.0](https://github.com/jpe-ansible/homelab-contracts/compare/v5.75.0...v5.76.0) (2026-11-23)
+
+
+### Features
+
+* **llm-model-catalog:** add GPU speech and MiMo GGUF records ([#411](https://github.com/jpe-ansible/homelab-contracts/issues/411)) ([49e82d4](https://github.com/jpe-ansible/homelab-contracts/commit/49e82d4da15adafeb7744dad05d9d41c85abbaa5))
+
+## [5.75.0](https://github.com/jpe-ansible/homelab-contracts/compare/v5.74.0...v5.75.0) (2026-11-23)
+
+
+### Features
+
+* **llm-roles:** keep the shared MLX residents on workstations ([#409](https://github.com/jpe-ansible/homelab-contracts/issues/409)) ([504edc2](https://github.com/jpe-ansible/homelab-contracts/commit/504edc2f286d23bdf0013f7c0cb8915b8c588a4a))
+
+## [5.74.0](https://github.com/jpe-ansible/homelab-contracts/compare/v5.73.0...v5.74.0) (2026-11-23)
+
+
+### Features
+
+* **llm-catalog:** add four MLX artifact records ([#407](https://github.com/jpe-ansible/homelab-contracts/issues/407)) ([3776d4d](https://github.com/jpe-ansible/homelab-contracts/commit/3776d4d337fbf7638cfa4796f7420cf63ffec3d8))
+
+## [5.73.0](https://github.com/jpe-ansible/homelab-contracts/compare/v5.72.0...v5.73.0) (2026-11-20)
+
+
+### Features
+
+* **schema:** allow optional A2A endpoint, callers and peers on roster agents ([#403](https://github.com/jpe-ansible/homelab-contracts/issues/403)) ([818f198](https://github.com/jpe-ansible/homelab-contracts/commit/818f198473f7bc8250f9387983d2818f0cc67492))
+
 ## [5.72.0](https://github.com/jpe-ansible/homelab-contracts/compare/v5.71.0...v5.72.0) (2026-11-16)
 
 

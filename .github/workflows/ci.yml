@@ -40,6 +40,12 @@ jobs:
             echo "wrong-ui-type fixture was accepted" >&2
             exit 1
           fi
+      - name: Reject a roster A2A URL without a scheme
+        run: |
+          if check-jsonschema --schemafile schemas/ansible-inventory-v1.json tests/inventory_agent_ownership/fixtures/a2a-url-no-scheme.json; then
+            echo "a2a-url-no-scheme fixture was accepted" >&2
+            exit 1
+          fi
       - name: Reject incomplete logical owner and physical identity shapes
         run: |
           jq '.agents["github-repository-specialist"].specializations = []' \
