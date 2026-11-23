@@ -26,13 +26,17 @@
           - agent_callers_registry['sandbox-agent']['trust_tier'] == 'public'
           - agent_callers_registry['sandbox-agent']['consumer_class'] == 'batch'
           - agent_callers_registry['sandbox-agent']['gateway_key'] == false
+          - agent_callers_registry['litellm-local-workstation']['trust_tier'] == 'public'
+          - agent_callers_registry['litellm-local-workstation']['consumer_class'] == 'interactive'
+          - agent_callers_registry['litellm-local-workstation']['gateway_key'] == false
           - >-
             (agent_callers_registry | dict2items | map(attribute='key') | unique | list | length)
             == (agent_callers_registry | length)
         fail_msg: >-
           callers.json must have schema version 1, unique caller ids and tiers,
           a default tier declared in tiers, antigravity-cli assigned to trusted,
-          and sandbox-agent assigned to the public tier as a batch consumer.
+          sandbox-agent assigned to the public tier as a batch consumer, and
+          litellm-local-workstation assigned to the public tier as an interactive consumer.
 
     - name: Every caller has a valid consumer class
       ansible.builtin.assert:
