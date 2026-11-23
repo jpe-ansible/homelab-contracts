@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Releases are managed automatically by [release-please](https://github.com/googleapis/release-please).
 
+## [5.74.0](https://github.com/jpe-ansible/homelab-contracts/compare/v5.73.0...v5.74.0) (2026-11-23)
+
+
+### Features
+
+* **llm-catalog:** add four MLX artifact records ([#407](https://github.com/jpe-ansible/homelab-contracts/issues/407)) ([3776d4d](https://github.com/jpe-ansible/homelab-contracts/commit/3776d4d337fbf7638cfa4796f7420cf63ffec3d8))
+
 ## [5.73.0](https://github.com/jpe-ansible/homelab-contracts/compare/v5.72.0...v5.73.0) (2026-11-20)
 
 
