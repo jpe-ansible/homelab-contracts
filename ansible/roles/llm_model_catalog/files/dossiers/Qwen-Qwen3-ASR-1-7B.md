@@ -62,8 +62,11 @@ status: started
   from `siblings[].lfs.sha256` at the pinned artifact revision.
 - Quantization recipe: GGUF `Q8_0`, identified by the published artifact filename;
   [audio.cpp Qwen3 ASR model guide](https://github.com/0xShug0/audio.cpp/blob/04a37f2e/docs/models/qwen3_asr.md).
-- Calibration provenance: not applicable; Q8_0 GGUF block quantization, with no calibration dataset listed in the artifact metadata or model guide.
-- Transformation: audio-cpp publishes a Q8_0 GGUF conversion of the upstream Qwen3-ASR checkpoint; converter provenance beyond the published file and model guide is not claimed.
+- Calibration provenance: not applicable; Q8_0 GGUF block quantization, with no
+  calibration dataset listed in the artifact metadata or model guide.
+- Transformation: audio-cpp publishes a Q8_0 GGUF conversion of the upstream
+  Qwen3-ASR checkpoint; converter provenance beyond the published file and model
+  guide is not claimed.
 
 ## 3. Runtime and memory
 

@@ -63,8 +63,11 @@ status: started
   from `siblings[].lfs.sha256` at the pinned artifact revision.
 - Quantization recipe: GGUF `Q8_0`, identified by the published artifact filename;
   [audio.cpp Ming TTS model guide](https://github.com/0xShug0/audio.cpp/blob/04a37f2e/docs/models/ming3_tts.md).
-- Calibration provenance: not applicable; Q8_0 GGUF block quantization, with no calibration dataset listed in the artifact metadata or model guide.
-- Transformation: audio-cpp publishes a Q8_0 GGUF conversion of the upstream Ming checkpoint; the GGUF includes the backbone, flow head, VAE and speaker encoder per the pinned model guide.
+- Calibration provenance: not applicable; Q8_0 GGUF block quantization, with no
+  calibration dataset listed in the artifact metadata or model guide.
+- Transformation: audio-cpp publishes a Q8_0 GGUF conversion of the upstream
+  Ming checkpoint; the GGUF includes the backbone, flow head, VAE and speaker
+  encoder per the pinned model guide.
 
 ## 3. Runtime and memory
 
