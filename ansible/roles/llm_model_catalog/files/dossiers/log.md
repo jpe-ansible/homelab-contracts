@@ -19,3 +19,16 @@
   and guard dossiers with source links, observation dates, and completion fields.
 * **Creation**: Indexed dossier files and recorded admission status.
 * **Update**: Documented the dated benchmark entry format.
+
+## 2026-11-22
+
+* **Creation**: Added started dossiers for the Gemma 4 12B IT MLX 4-bit, Qwen3-ASR-1.7B
+  MLX 8-bit and Ming-3.0-tts-0.5B MLX 8-bit artifacts, with Hub identity, affine
+  quantization evidence, and one dated benchmark each.
+* **Creation**: Added a started dossier for the Inkling 2 Mini MLX 4-bit
+  artifact, with Hub identity, affine quantization evidence, and one dated
+  benchmark.
+* **Update**: Added pinned audio.cpp Q8_0 GGUF artifact records for Qwen3-ASR-1.7B
+  and Ming-3.0-tts-0.5B, with Hub revisions, file digests, sizes, and source links.
+* **Update**: Added the pinned bartowski MiMo-V2.6-Distill-Qwen-9B Q4_K_M GGUF
+  artifact record with its Hub revision, file digest, size, and source links.
