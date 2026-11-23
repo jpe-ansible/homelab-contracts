@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Releases are managed automatically by [release-please](https://github.com/googleapis/release-please).
 
+## [5.75.0](https://github.com/jpe-ansible/homelab-contracts/compare/v5.74.0...v5.75.0) (2026-11-23)
+
+
+### Features
+
+* **llm-roles:** keep the shared MLX residents on workstations ([#409](https://github.com/jpe-ansible/homelab-contracts/issues/409)) ([504edc2](https://github.com/jpe-ansible/homelab-contracts/commit/504edc2f286d23bdf0013f7c0cb8915b8c588a4a))
+
 ## [5.74.0](https://github.com/jpe-ansible/homelab-contracts/compare/v5.73.0...v5.74.0) (2026-11-23)
 
 
