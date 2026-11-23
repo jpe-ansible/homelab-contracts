@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "as_of": "2026-11-13",
+  "as_of": "2026-11-22",
   "max_age_days": 365,
   "deny": [
     {
@@ -172,6 +172,30 @@
       "upstream_id": "nvidia/NVIDIA-Nemotron-3.5-Transcribe-30B-A4B",
       "upstream_created": "2026-10-07",
       "dossier": "ansible/roles/llm_model_catalog/files/dossiers/nvidia-NVIDIA-Nemotron-3-5-Transcribe-30B-A4B.md"
+    },
+    {
+      "id": "mlx-community/gemma-4-12B-it-4bit",
+      "upstream_id": "google/gemma-4-12B-it",
+      "upstream_created": "2026-05-23",
+      "dossier": "ansible/roles/llm_model_catalog/files/dossiers/google-gemma-4-12B-it.md"
+    },
+    {
+      "id": "mlx-community/Qwen3-ASR-1.7B-8bit",
+      "upstream_id": "Qwen/Qwen3-ASR-1.7B",
+      "upstream_created": "2026-01-28",
+      "dossier": "ansible/roles/llm_model_catalog/files/dossiers/Qwen-Qwen3-ASR-1-7B.md"
+    },
+    {
+      "id": "mlx-community/Ming-3.0-tts-0.5B-8bit",
+      "upstream_id": "inclusionAI/Ming-3.0-tts-0.5B",
+      "upstream_created": "2026-09-22",
+      "dossier": "ansible/roles/llm_model_catalog/files/dossiers/inclusionAI-Ming-3-0-tts-0-5B.md"
+    },
+    {
+      "id": "mlx-community/Inkling-2-Mini-4bit",
+      "upstream_id": "thinkingmachines/Inkling-2-Mini",
+      "upstream_created": "2026-11-17",
+      "dossier": "ansible/roles/llm_model_catalog/files/dossiers/thinkingmachines-Inkling-2-Mini.md"
     }
   ],
   "exempt_hosted": [
