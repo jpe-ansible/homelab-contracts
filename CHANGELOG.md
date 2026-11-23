@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Releases are managed automatically by [release-please](https://github.com/googleapis/release-please).
 
+## [5.77.0](https://github.com/jpe-ansible/homelab-contracts/compare/v5.76.0...v5.77.0) (2026-11-23)
+
+
+### Features
+
+* **agent_callers:** add the litellm-local-workstation caller to the public tier ([#413](https://github.com/jpe-ansible/homelab-contracts/issues/413)) ([702fd09](https://github.com/jpe-ansible/homelab-contracts/commit/702fd09659f78ed11f78044ce4c35e6d5ac56533))
+
 ## [5.76.0](https://github.com/jpe-ansible/homelab-contracts/compare/v5.75.0...v5.76.0) (2026-11-23)
 
 
