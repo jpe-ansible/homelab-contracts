@@ -47,6 +47,24 @@ status: started
 - Maximum positions in the pinned config: 65536 (`thinker_config.text_config.max_position_embeddings`).
   The catalog serves 65536.
 
+### audio-cpp/audio.cpp-gguf
+
+- Artifact metadata: [Hugging Face API](https://huggingface.co/api/models/audio-cpp/audio.cpp-gguf?blobs=true),
+  observed 2026-11-22.
+- Artifact repository: `audio-cpp/audio.cpp-gguf`.
+- Artifact publisher: `audio-cpp` (`author`).
+- Immutable artifact revision: `5140b027d3c416e5e3719002f98f09a196e0db6a` (`sha`).
+  [Pinned file](https://huggingface.co/audio-cpp/audio.cpp-gguf/blob/5140b027d3c416e5e3719002f98f09a196e0db6a/Qwen3-ASR-1.7B-GGUF/qwen3-asr-1.7b-q8_0.gguf).
+- Artifact created date: 2026-07-14T05:56:32.000Z (`createdAt`), per the Hub API.
+- Evidence observed date: 2026-11-22, [Hub API](https://huggingface.co/api/models/audio-cpp/audio.cpp-gguf?blobs=true).
+- Filename and bytes: `Qwen3-ASR-1.7B-GGUF/qwen3-asr-1.7b-q8_0.gguf`,
+  2473017600 bytes. SHA256: `3bc2462eca3a3a8f56abcd860d0943ffdc0546547dde55a9d08589607d6f3936`,
+  from `siblings[].lfs.sha256` at the pinned artifact revision.
+- Quantization recipe: GGUF `Q8_0`, identified by the published artifact filename;
+  [audio.cpp Qwen3 ASR model guide](https://github.com/0xShug0/audio.cpp/blob/04a37f2e/docs/models/qwen3_asr.md).
+- Calibration provenance: not applicable; Q8_0 GGUF block quantization, with no calibration dataset listed in the artifact metadata or model guide.
+- Transformation: audio-cpp publishes a Q8_0 GGUF conversion of the upstream Qwen3-ASR checkpoint; converter provenance beyond the published file and model guide is not claimed.
+
 ## 3. Runtime and memory
 
 - Runtime: `mlx-audio` 0.6.5 serves `qwen3_asr` (`stt/models/qwen3_asr`) through

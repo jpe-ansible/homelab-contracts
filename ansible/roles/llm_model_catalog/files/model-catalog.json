@@ -20,6 +20,8 @@
     {"name":"mlx-community/gemma-4-12B-it-4bit","context_window":131072,"max_parallel_requests":4,"profiles":{"mlx":{"context_window":131072,"max_parallel_requests":4}}},
     {"name":"mlx-community/Qwen3-ASR-1.7B-8bit","context_window":65536,"max_parallel_requests":4,"profiles":{"mlx":{"context_window":65536,"max_parallel_requests":4}}},
     {"name":"mlx-community/Ming-3.0-tts-0.5B-8bit","context_window":32768,"max_parallel_requests":4,"profiles":{"mlx":{"context_window":32768,"max_parallel_requests":4}}},
+    {"name":"qwen3-asr-1-7b-audiocpp","context_window":65536,"max_parallel_requests":1,"profiles":{"speech":{"max_output_tokens":4096,"num_retries":0}},"hf_repo":"audio-cpp/audio.cpp-gguf","gguf":"Qwen3-ASR-1.7B-GGUF/qwen3-asr-1.7b-q8_0.gguf","hf_revision":"5140b027d3c416e5e3719002f98f09a196e0db6a"},
+    {"name":"ming-3-0-tts-audiocpp","context_window":32768,"max_parallel_requests":1,"profiles":{"speech":{"max_output_tokens":4096,"num_retries":0}},"hf_repo":"audio-cpp/Ming-3.0-TTS-0.5B-GGUF","gguf":"ming-3.0-tts-0.5b-q8_0.gguf","hf_revision":"2eb8d37c7f10672e69c8aa33091baa04c461b66c"},
     {"name":"mlx-community/Inkling-2-Mini-4bit","context_window":131072,"max_parallel_requests":2,"profiles":{"mlx":{"context_window":131072,"max_parallel_requests":2}}},
     {"name":"mlx-community/K2-Horizon-7B-oQ6e","context_window":65536,"max_output_tokens":32768,"max_parallel_requests":4,"profiles":{"mlx":{"context_window":65536,"max_output_tokens":32768,"max_parallel_requests":4},"small-trial-mlx-q6":{"context_window":32768,"max_output_tokens":32768,"max_parallel_requests":4}}},
     {"name":"mlx-community/Qwen3.6-35B-A3B-4bit","context_window":65536},

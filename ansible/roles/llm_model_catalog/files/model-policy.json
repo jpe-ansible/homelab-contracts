@@ -186,7 +186,19 @@
       "dossier": "ansible/roles/llm_model_catalog/files/dossiers/Qwen-Qwen3-ASR-1-7B.md"
     },
     {
+      "id": "audio-cpp/audio.cpp-gguf",
+      "upstream_id": "Qwen/Qwen3-ASR-1.7B",
+      "upstream_created": "2026-01-28",
+      "dossier": "ansible/roles/llm_model_catalog/files/dossiers/Qwen-Qwen3-ASR-1-7B.md"
+    },
+    {
       "id": "mlx-community/Ming-3.0-tts-0.5B-8bit",
+      "upstream_id": "inclusionAI/Ming-3.0-tts-0.5B",
+      "upstream_created": "2026-09-22",
+      "dossier": "ansible/roles/llm_model_catalog/files/dossiers/inclusionAI-Ming-3-0-tts-0-5B.md"
+    },
+    {
+      "id": "audio-cpp/Ming-3.0-TTS-0.5B-GGUF",
       "upstream_id": "inclusionAI/Ming-3.0-tts-0.5B",
       "upstream_created": "2026-09-22",
       "dossier": "ansible/roles/llm_model_catalog/files/dossiers/inclusionAI-Ming-3-0-tts-0-5B.md"

@@ -90,9 +90,9 @@ without role assignments. Shared defaults cannot supply model-specific scores.
 * [Gemma 4 12B IT](google-gemma-4-12B-it.md)
   Catalog artifact evidence (MLX 4-bit build).
 * [Qwen3-ASR-1.7B](Qwen-Qwen3-ASR-1-7B.md)
-  Catalog artifact evidence (MLX 8-bit build).
+  Catalog artifact evidence (MLX 8-bit and audio.cpp Q8_0 builds).
 * [Ming-3.0-tts-0.5B](inclusionAI-Ming-3-0-tts-0-5B.md)
-  Catalog artifact evidence (MLX 8-bit build).
+  Catalog artifact evidence (MLX 8-bit and audio.cpp Q8_0 builds).
 * [Inkling 2 Mini](thinkingmachines-Inkling-2-Mini.md)
   Catalog artifact evidence (MLX 4-bit build).
 
