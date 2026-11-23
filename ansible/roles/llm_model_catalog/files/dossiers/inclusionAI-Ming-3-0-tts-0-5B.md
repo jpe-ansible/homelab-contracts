@@ -47,6 +47,28 @@ status: started
 - Maximum positions in the pinned config: 32768 (`llm_config.max_position_embeddings`).
   The catalog serves 32768.
 
+### audio-cpp/Ming-3.0-TTS-0.5B-GGUF
+
+- Artifact metadata: [Hugging Face API](https://huggingface.co/api/models/audio-cpp/Ming-3.0-TTS-0.5B-GGUF?blobs=true),
+  observed 2026-11-22.
+- Artifact repository: `audio-cpp/Ming-3.0-TTS-0.5B-GGUF`.
+- Artifact publisher: `audio-cpp` (`author`).
+- Immutable artifact revision: `2eb8d37c7f10672e69c8aa33091baa04c461b66c` (`sha`).
+  [Pinned file](https://huggingface.co/audio-cpp/Ming-3.0-TTS-0.5B-GGUF/blob/2eb8d37c7f10672e69c8aa33091baa04c461b66c/ming-3.0-tts-0.5b-q8_0.gguf).
+- Artifact created date: 2026-10-21T03:55:46.000Z (`createdAt`), per the Hub API.
+- Evidence observed date: 2026-11-22,
+  [Hub API](https://huggingface.co/api/models/audio-cpp/Ming-3.0-TTS-0.5B-GGUF?blobs=true).
+- Filename and bytes: `ming-3.0-tts-0.5b-q8_0.gguf`, 1742280896 bytes.
+  SHA256: `fcf2aa25e8e9cf2065a936e506581735c64d6255fb7869f09fbb61a2dde09aa1`,
+  from `siblings[].lfs.sha256` at the pinned artifact revision.
+- Quantization recipe: GGUF `Q8_0`, identified by the published artifact filename;
+  [audio.cpp Ming TTS model guide](https://github.com/0xShug0/audio.cpp/blob/04a37f2e/docs/models/ming3_tts.md).
+- Calibration provenance: not applicable; Q8_0 GGUF block quantization, with no
+  calibration dataset listed in the artifact metadata or model guide.
+- Transformation: audio-cpp publishes a Q8_0 GGUF conversion of the upstream
+  Ming checkpoint; the GGUF includes the backbone, flow head, VAE and speaker
+  encoder per the pinned model guide.
+
 ## 3. Runtime and memory
 
 - Runtime: `mlx-audio` 0.6.5 serves model_type `dense` (`tts/models/dense`) through
