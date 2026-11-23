@@ -108,6 +108,12 @@
       "dossier": "ansible/roles/llm_model_catalog/files/dossiers/XiaomiMiMo-MiMo-V2-6-Distill-Qwen-9B.md"
     },
     {
+      "id": "bartowski/MiMo-V2.6-Distill-Qwen-9B-GGUF",
+      "upstream_id": "XiaomiMiMo/MiMo-V2.6-Distill-Qwen-9B",
+      "upstream_created": "2026-09-21",
+      "dossier": "ansible/roles/llm_model_catalog/files/dossiers/XiaomiMiMo-MiMo-V2-6-Distill-Qwen-9B.md"
+    },
+    {
       "id": "IFM/K2-Horizon-7B-GGUF",
       "upstream_id": "IFM/K2-Horizon-7B",
       "upstream_created": "2026-09-01",

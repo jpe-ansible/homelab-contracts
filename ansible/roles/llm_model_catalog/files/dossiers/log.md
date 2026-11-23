@@ -30,3 +30,5 @@
   benchmark.
 * **Update**: Added pinned audio.cpp Q8_0 GGUF artifact records for Qwen3-ASR-1.7B
   and Ming-3.0-tts-0.5B, with Hub revisions, file digests, sizes, and source links.
+* **Update**: Added the pinned bartowski MiMo-V2.6-Distill-Qwen-9B Q4_K_M GGUF
+  artifact record with its Hub revision, file digest, size, and source links.
