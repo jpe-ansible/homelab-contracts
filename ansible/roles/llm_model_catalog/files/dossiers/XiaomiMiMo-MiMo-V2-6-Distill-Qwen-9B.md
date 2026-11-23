@@ -77,7 +77,7 @@ status: started
 - Filename and bytes: `MiMo-V2.6-Distill-Qwen-9B-Q4_K_M.gguf`,
   5841049120 bytes. SHA256: `4bca6f18c73f72270c7a20c2ea2bea581de8246e318714277120369d34048c81`,
   from the Xet pointer at the pinned artifact revision.
-  [Pinned file page](https://huggingface.co/bartowski/MiMo-V2.6-Distill-Qwen-9B-GGUF/blob/4371da10c84fb26da3592d4cf312d24aa82b7b65/MiMo-V2.6-Distill-Qwen-9B-Q4_K_M.gguf).
+  [Pinned file page][mimo-gguf-file].
 - Quantization recipe: GGUF `Q4_K_M`, built with llama.cpp b10964 using a
   publisher-provided per-tensor layout and imatrix,
   [pinned publisher card](https://huggingface.co/bartowski/MiMo-V2.6-Distill-Qwen-9B-GGUF/blob/4371da10c84fb26da3592d4cf312d24aa82b7b65/README.md).
@@ -87,3 +87,5 @@ status: started
   [pinned publisher card](https://huggingface.co/bartowski/MiMo-V2.6-Distill-Qwen-9B-GGUF/blob/4371da10c84fb26da3592d4cf312d24aa82b7b65/README.md).
 - Upstream source revision: `1f09ddcc1a0ea45751ae0dfe2af20d533168c46f`.
 - Listed file matches the observed artifact revision.
+
+[mimo-gguf-file]: https://huggingface.co/bartowski/MiMo-V2.6-Distill-Qwen-9B-GGUF/blob/4371da10c84fb26da3592d4cf312d24aa82b7b65/MiMo-V2.6-Distill-Qwen-9B-Q4_K_M.gguf
