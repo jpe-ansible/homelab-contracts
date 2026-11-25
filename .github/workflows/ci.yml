@@ -219,7 +219,7 @@ jobs:
         with:
           python-version: "3.15"
       - name: Install ansible-lint
-        run: pip install 'ansible-lint==25.*' 'ansible-core==2.18.*' boto3 botocore hvac
+        run: pip install 'ansible-lint==26.*' 'ansible-core==2.18.*' boto3 botocore hvac
       - name: Install required collections
         run: ansible-galaxy collection install amazon.aws community.hashi_vault community.general
       - name: Converge bao_approle_cli in a Debian container
