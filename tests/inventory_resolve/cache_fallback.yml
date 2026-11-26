@@ -7,9 +7,6 @@
 # its age limit must leave today's composed failure intact, with the cache
 # named as source 3 and the reason.
 #
-# CI runs this file through the import_playbook at the end of
-# apply_owed_fail_open.yml — the workflow names that file specifically.
-#
 # The store stub below is the same mechanism apply_owed_read_failure.yml
 # uses: include_role params outrank registered vars (role params beat
 # set_facts/registered results in Ansible's precedence), so stubbing
@@ -134,6 +131,7 @@
         path: "{{ cache_dir.path }}/ansible_inventory.json"
         state: touch
         modification_time: "202001011200.00"
+        mode: "0600"
 
     - name: Resolve with the store down and only a stale cache on disk
       block:

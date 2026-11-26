@@ -268,6 +268,12 @@ jobs:
         env:
           ANSIBLE_ROLES_PATH: ansible/roles
         run: ansible-playbook -i localhost, tests/inventory_resolve/apply_owed_read_failure.yml
+      # Source 3: a fresh runner cache rescues a failed store download; a stale
+      # or missing one keeps the composed failure; a validated download is cached.
+      - name: Verify the inventory cache fallback
+        env:
+          ANSIBLE_ROLES_PATH: ansible/roles
+        run: ansible-playbook -i localhost, tests/inventory_resolve/cache_fallback.yml
       # The hook must keep the apps mechanism (first live cache wins, probe
       # retried, logged DIRECT fallback, hook registered for http AND https)
       # and the input must be a non-empty list of http(s) URLs. The real
