@@ -304,6 +304,9 @@
         path: "{{ inventory_resolve_cache_dir }}"
         state: directory
         mode: "0700"
+      # The cache is controller-local state, like the temp file: write it under
+      # --check too, or the copy below fails on a directory check mode only simulated.
+      check_mode: false
 
     - name: Cache the downloaded inventory
       ansible.builtin.copy:
@@ -311,6 +314,7 @@
         dest: "{{ inventory_resolve_cache_file }}"
         remote_src: true
         mode: "0600"
+      check_mode: false
 
 # --- is an apply owed? ------------------------------------------------------
 #

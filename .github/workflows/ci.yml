@@ -274,6 +274,10 @@ jobs:
         env:
           ANSIBLE_ROLES_PATH: ansible/roles
         run: ansible-playbook -i localhost, tests/inventory_resolve/cache_fallback.yml
+      - name: Verify the runner cache is written under --check
+        env:
+          ANSIBLE_ROLES_PATH: ansible/roles
+        run: ansible-playbook --check -i localhost, tests/inventory_resolve/cache_write_check_mode.yml
       - name: Verify inventory download failure reason within 30 seconds
         env:
           ANSIBLE_ROLES_PATH: ansible/roles
