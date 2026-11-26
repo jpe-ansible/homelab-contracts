@@ -1,0 +1,274 @@
+---
+# Cache-fallback contract for source 3 in the inventory_resolve role.
+#
+# The role must keep a copy of every store download that passes its own
+# validation, and use that copy — announced, with its age and the store
+# error — when the store cannot answer. A cache that is missing or past
+# its age limit must leave today's composed failure intact, with the cache
+# named as source 3 and the reason.
+#
+# CI runs this file through the import_playbook at the end of
+# apply_owed_fail_open.yml — the workflow names that file specifically.
+#
+# The store stub below is the same mechanism apply_owed_read_failure.yml
+# uses: include_role params outrank registered vars (role params beat
+# set_facts/registered results in Ansible's precedence), so stubbing
+# inventory_resolve_object_storage makes the role behave exactly as after a
+# real credential read, and stubbing inventory_resolve_tmp.path stands in
+# for a completed download. The download task itself still runs for real —
+# and fails against an unreachable loopback endpoint, so the failure paths
+# below exercise a genuine download failure, not a shortcut around it.
+#
+# Each scenario runs on its own throwaway host (added by the first play,
+# connection local): set_fact facts cannot be unset mid-run, and one
+# scenario's resolution must never satisfy another's gates.
+#
+# Run: ANSIBLE_ROLES_PATH=ansible/roles ansible-playbook -i localhost, \
+#        tests/inventory_resolve/cache_fallback.yml
+
+- name: Give each cache scenario its own throwaway host
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Add one fact-clean host per scenario
+      ansible.builtin.add_host:
+        name: "{{ item }}"
+        ansible_connection: local
+      loop:
+        - inventory_resolve_fresh_cache
+        - inventory_resolve_stale_cache
+        - inventory_resolve_missing_cache
+        - inventory_resolve_cache_write
+
+- name: A fresh cached inventory rescues a failed store download
+  hosts: inventory_resolve_fresh_cache
+  gather_facts: false
+  vars: &store_stub
+    # Force source 1 off regardless of the controller's environment.
+    inventory_resolve_path: ""
+    # Credentials look present, so the block runs and the download is
+    # genuinely attempted — against an endpoint where nothing listens.
+    inventory_resolve_openbao_addr: "http://127.0.0.1:1"
+    inventory_resolve_openbao_token: stub
+    inventory_resolve_openbao_validate_certs: false
+    inventory_resolve_object_storage:
+      secret:
+        S3_ENDPOINT: "http://127.0.0.1:1"
+        S3_ACCESS_KEY_ID: unreachable
+        S3_SECRET_ACCESS_KEY: unreachable
+        S3_REGION: us-east-1
+    inventory_resolve_s3_uri: "s3://iac-inventory/ansible_inventory.json"
+    inventory_resolve_s3_timeout_seconds: 15
+    # Named explicitly so the assertions below can reference the limit.
+    inventory_resolve_cache_max_age_hours: 72
+  tasks:
+    - name: Create a scratch cache directory for this run
+      ansible.builtin.tempfile:
+        state: directory
+        suffix: inventory_resolve_cache
+      register: cache_dir
+
+    - name: Seed the cache with a just-downloaded inventory
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/fixtures/ansible_inventory.json"
+        dest: "{{ cache_dir.path }}/ansible_inventory.json"
+        mode: "0600"
+
+    - name: Resolve with the store down and a fresh cache on disk
+      ansible.builtin.include_role:
+        name: inventory_resolve
+      vars:
+        <<: *store_stub
+        inventory_resolve_cache_dir: "{{ cache_dir.path }}"
+
+    - name: The run resolved from the cache, not from the store
+      ansible.builtin.assert:
+        that:
+          - tofu_inventory_resolved == cache_dir.path ~ '/ansible_inventory.json'
+          - tofu_data is defined
+          - tofu_data.nodes is defined
+        fail_msg: >-
+          A fresh cache did not rescue a failed download — the resolved path
+          or the loaded data does not come from the cache.
+        success_msg: failed download fell back to the fresh cached inventory
+
+    - name: The cache age was computed and within the limit
+      ansible.builtin.assert:
+        that:
+          - inventory_resolve_cache_age_hours is defined
+          - inventory_resolve_cache_age_hours | float >= 0
+          - inventory_resolve_cache_age_hours | float <= inventory_resolve_cache_max_age_hours | float
+        fail_msg: >-
+          The cache age fact is missing or out of range — the fallback
+          announcement (which prints that age) cannot be trusted.
+        success_msg: cache age computed fresh and within the limit
+
+    - name: The apply-owed check still fails open on a cached artifact
+      ansible.builtin.assert:
+        that:
+          - tofu_desired_state_current is not defined
+        fail_msg: >-
+          A cache hit produced a currency verdict although the live read ran
+          against a dead store. The cache must not make stale look current.
+        success_msg: apply-owed verdict left unset on the cache path (fail-open)
+
+- name: A stale cached inventory keeps the composed failure, cache named as source 3
+  hosts: inventory_resolve_stale_cache
+  gather_facts: false
+  tasks:
+    - name: Create a scratch cache directory for this run
+      ansible.builtin.tempfile:
+        state: directory
+        suffix: inventory_resolve_cache
+      register: cache_dir
+
+    - name: Seed the cache with an inventory
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/fixtures/ansible_inventory.json"
+        dest: "{{ cache_dir.path }}/ansible_inventory.json"
+        mode: "0600"
+
+    - name: Age the cached inventory past the limit
+      ansible.builtin.file:
+        path: "{{ cache_dir.path }}/ansible_inventory.json"
+        state: touch
+        modification_time: "202001011200.00"
+
+    - name: Resolve with the store down and only a stale cache on disk
+      block:
+        - name: This must fail — no source may resolve
+          ansible.builtin.include_role:
+            name: inventory_resolve
+          vars:
+            <<: *store_stub
+            inventory_resolve_cache_dir: "{{ cache_dir.path }}"
+
+        - name: The role did not fail, so the stale cache was used
+          ansible.builtin.fail:
+            msg: a stale cache must not rescue a failed download
+
+      rescue:
+        - name: The failure names every source, cache included, with the reason
+          ansible.builtin.assert:
+            that:
+              - "'1. TOFU_INVENTORY_PATH' in ansible_failed_result.msg"
+              - "'2. published artifact' in ansible_failed_result.msg"
+              - "'3. runner cache' in ansible_failed_result.msg"
+              - "'hours old — over the' in ansible_failed_result.msg"
+            fail_msg: >-
+              The terminal failure does not name the cache as source 3 with its
+              age-over-limit reason. Got: {{ ansible_failed_result.msg }}
+            success_msg: stale cache reported as source 3 with its reason
+
+        - name: Nothing was loaded from the stale cache
+          ansible.builtin.assert:
+            that:
+              - tofu_data is not defined
+              - tofu_inventory_resolved is not defined
+            fail_msg: >-
+              The stale cache loaded anyway — an inventory past its age limit
+              must not be consumed silently.
+            success_msg: stale cache was neither used nor loaded
+
+- name: A missing cached inventory keeps the composed failure, cache named as source 3
+  hosts: inventory_resolve_missing_cache
+  gather_facts: false
+  tasks:
+    - name: Create an empty scratch cache directory for this run
+      ansible.builtin.tempfile:
+        state: directory
+        suffix: inventory_resolve_cache
+      register: cache_dir
+
+    - name: Resolve with the store down and no cache on disk
+      block:
+        - name: This must fail — no source may resolve
+          ansible.builtin.include_role:
+            name: inventory_resolve
+          vars:
+            <<: *store_stub
+            inventory_resolve_cache_dir: "{{ cache_dir.path }}"
+
+        - name: The role did not fail, so something resolved without a cache
+          ansible.builtin.fail:
+            msg: with no cache on disk the run must still fail
+
+      rescue:
+        - name: The failure names the cache as source 3, missing
+          ansible.builtin.assert:
+            that:
+              - "'3. runner cache' in ansible_failed_result.msg"
+              - "'cache missing' in ansible_failed_result.msg"
+            fail_msg: >-
+              The terminal failure does not name the cache as source 3 with
+              the missing-cache reason. Got: {{ ansible_failed_result.msg }}
+            success_msg: missing cache reported as source 3, missing
+
+- name: A store download that passes validation is written into the cache
+  hosts: inventory_resolve_cache_write
+  gather_facts: false
+  tasks:
+    - name: Create a scratch cache directory for this run
+      ansible.builtin.tempfile:
+        state: directory
+        suffix: inventory_resolve_cache
+      register: cache_dir
+
+    - name: Create the file the download will have produced
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/fixtures/ansible_inventory.json"
+        dest: "{{ cache_dir.path }}/downloaded.json"
+        mode: "0600"
+
+    - name: Resolve with the store appearing to answer
+      ansible.builtin.include_role:
+        name: inventory_resolve
+      vars:
+        <<: *store_stub
+        inventory_resolve_cache_dir: "{{ cache_dir.path }}"
+        # Role params outrank registered vars, so this path survives the
+        # role's own tempfile registration and the download task writes to
+        # (fails against the dead endpoint without touching) a file that
+        # already holds the artifact — indistinguishable, to everything
+        # downstream of the download, from a completed store download.
+        inventory_resolve_tmp:
+          path: "{{ cache_dir.path }}/downloaded.json"
+
+    - name: The run resolved from that download
+      ansible.builtin.assert:
+        that:
+          - tofu_inventory_resolved == cache_dir.path ~ '/downloaded.json'
+          - tofu_data is defined
+        fail_msg: the simulated download did not resolve
+        success_msg: resolved from the store download
+
+    - name: Look at what landed in the cache
+      ansible.builtin.stat:
+        path: "{{ cache_dir.path }}/ansible_inventory.json"
+      register: cached
+
+    - name: The cache holds the downloaded inventory with mode 0600
+      ansible.builtin.assert:
+        that:
+          - cached.stat.exists
+          - cached.stat.path == cache_dir.path ~ '/ansible_inventory.json'
+          - cached.stat.mode == '0600'
+        fail_msg: >-
+          The validated store download did not land in the cache at
+          {{ cache_dir.path }}/ansible_inventory.json with mode 0600.
+          Got: {{ cached.stat }}
+        success_msg: validated download written to the cache
+
+    - name: Look at the cache directory itself
+      ansible.builtin.stat:
+        path: "{{ cache_dir.path }}"
+      register: cache_root
+
+    - name: Cache directory mode is 0700
+      ansible.builtin.assert:
+        that:
+          - cache_root.stat.mode == '0700'
+        fail_msg: >-
+          The cache directory is not 0700: {{ cache_root.stat.mode }}
+        success_msg: cache directory is 0700

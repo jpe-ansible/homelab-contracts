@@ -8,11 +8,19 @@ Source priority (first match wins):
 1. `TOFU_INVENTORY_PATH` — explicit local path (tests, pins)
 2. Published S3 artifact — the homelab RustFS object, using credentials read
    natively from OpenBao `secret/platform/object-storage`
+3. Runner cache — `$HOME/.cache/inventory_resolve/ansible_inventory.json`, the
+   last artifact this runner downloaded successfully, used only while it is
+   younger than `inventory_resolve_cache_max_age_hours` (72 by default)
 
-Those two are the whole list. The published object is the only source of live
-infrastructure data: a local on-disk copy cannot know whether it is current,
-and one that has fallen behind deploys wrong VMIDs and IPs while every task
-reports success. An inventory that does not resolve is a hard failure.
+The published object is the only source of live infrastructure data. The cache
+is not a second opinion about currency — it exists so that a store outage does
+not take every run down with it, including the runs that would repair the
+store. It is written only after a store download passes the role's own
+validation (parse plus required keys), a hit is announced in the play output
+with its age and the store error, and the apply-owed detector below still runs
+on a cached artifact and fails open exactly as it does for a store download.
+An inventory that resolves from none of the three is a hard failure naming
+each source and what went wrong.
 
 This list is the canonical statement of the resolution order. Consumer repos
 link here rather than restating it.

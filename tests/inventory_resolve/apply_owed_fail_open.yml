@@ -51,3 +51,7 @@
           state. It must skip when it cannot run, never default to "current" —
           a detector that passes when it did not execute is worse than none.
         success_msg: check skipped and left the verdict unset (fail-open)
+
+# The cache-fallback contract plays live in cache_fallback.yml. CI names this
+# file specifically, so it is imported here to run with the same step.
+- import_playbook: cache_fallback.yml

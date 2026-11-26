@@ -1,8 +1,8 @@
 ---
 # inventory_resolve — shared resolution of the published OpenTofu inventory.
 #
-# Resolution order and why there is no local-cache tier: see README.md, which
-# is the single canonical statement of both.
+# Resolution order and the role of the runner cache: see README.md, which is
+# the single canonical statement of both.
 #
 # The role ends with `tofu_data` loaded and `tofu_inventory_resolved` set.
 # Repo-specific asserts and add_host group mapping stay in the consumer.
@@ -23,6 +23,12 @@ inventory_resolve_onprem_default_uri: "s3://iac-inventory/ansible_inventory.json
 
 # Bounds the object-store download (Ansible task-level timeout)
 inventory_resolve_s3_timeout_seconds: 120
+
+# Source 3: where this runner keeps the last successfully downloaded inventory.
+inventory_resolve_cache_dir: "{{ lookup('ansible.builtin.env', 'HOME') }}/.cache/inventory_resolve"
+
+# How old the cached inventory may be before a failed download stops falling back to it.
+inventory_resolve_cache_max_age_hours: 72
 
 # Desired-state object the loaded artifact is checked against, to answer "is an
 # apply owed before this converge?" (see tasks/main.yml). Desired state and the
