@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Releases are managed automatically by [release-please](https://github.com/googleapis/release-please).
 
+## [5.79.2](https://github.com/jpe-ansible/homelab-contracts/compare/v5.79.1...v5.79.2) (2026-11-26)
+
+
+### Bug Fixes
+
+* **inventory_resolve:** write the runner cache under --check ([#425](https://github.com/jpe-ansible/homelab-contracts/issues/425)) ([dd69ac3](https://github.com/jpe-ansible/homelab-contracts/commit/dd69ac376cbfd8aaf54d1372944d5df7c068bb69))
+
 ## [5.79.1](https://github.com/jpe-ansible/homelab-contracts/compare/v5.79.0...v5.79.1) (2026-11-26)
 
 
