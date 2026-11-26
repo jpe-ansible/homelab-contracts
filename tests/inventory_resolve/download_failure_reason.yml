@@ -1,0 +1,58 @@
+---
+# A botocore connection error must survive registration and appear in the
+# composed terminal failure. CI bounds this playbook with `timeout 30s`.
+#
+# Run: ANSIBLE_ROLES_PATH=ansible/roles timeout 30s ansible-playbook \
+#        -i localhost, tests/inventory_resolve/download_failure_reason.yml
+
+- name: A failed object download is recorded with its reason
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Create an empty cache directory so no cache can resolve
+      ansible.builtin.tempfile:
+        state: directory
+        suffix: inventory_resolve_cache
+      register: cache_dir
+
+    - name: Resolve with the object store unreachable and no cached inventory
+      block:
+        - name: The role must fail when no source resolves
+          ansible.builtin.include_role:
+            name: inventory_resolve
+          vars:
+            inventory_resolve_path: ""
+            inventory_resolve_openbao_addr: "http://127.0.0.1:9"
+            inventory_resolve_openbao_token: stub
+            inventory_resolve_openbao_validate_certs: false
+            inventory_resolve_object_storage:
+              secret:
+                S3_ENDPOINT: "http://127.0.0.1:9"
+                S3_ACCESS_KEY_ID: unreachable
+                S3_SECRET_ACCESS_KEY: unreachable
+                S3_REGION: us-east-1
+            inventory_resolve_s3_uri: >-
+              s3://test-inventory/ansible_inventory.json
+            inventory_resolve_s3_connect_timeout_seconds: 2
+            inventory_resolve_s3_read_timeout_seconds: 2
+            inventory_resolve_cache_dir: "{{ cache_dir.path }}"
+
+        - name: The role unexpectedly resolved an inventory source
+          ansible.builtin.fail:
+            msg: the role returned without resolving a source
+
+      rescue:
+        - name: The composed failure preserves the download error
+          ansible.builtin.assert:
+            that:
+              - >-
+                'object download (' in ansible_failed_result.msg
+              - "'connect' in (ansible_failed_result.msg | lower)"
+              - "'the module reported no error' not in ansible_failed_result.msg"
+              - "'failed to import' not in (ansible_failed_result.msg | lower)"
+            fail_msg: >-
+              Expected the composed failure to include the object-store
+              connection error; got: {{ ansible_failed_result.msg }}
+            success_msg: >-
+              composed failure includes the object-store connection error
