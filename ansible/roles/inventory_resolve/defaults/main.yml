@@ -21,6 +21,9 @@ inventory_resolve_openbao_path: platform/object-storage
 inventory_resolve_openbao_validate_certs: true
 inventory_resolve_onprem_default_uri: "s3://iac-inventory/ansible_inventory.json"
 
+# Bounds the object-store download (Ansible task-level timeout)
+inventory_resolve_s3_timeout_seconds: 120
+
 # Desired-state object the loaded artifact is checked against, to answer "is an
 # apply owed before this converge?" (see tasks/main.yml). Desired state and the
 # published artifact are two objects in ONE store, so the bucket is derived from
