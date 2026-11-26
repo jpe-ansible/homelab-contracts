@@ -1,0 +1,63 @@
+---
+# The runner cache is controller-local state, like the role's temp file: a
+# --check run must still create its directory and write it, or the copy fails
+# on a directory that check mode only pretended to create.
+#
+# Run (CI does): ANSIBLE_ROLES_PATH=ansible/roles ansible-playbook --check \
+#   -i localhost, tests/inventory_resolve/cache_write_check_mode.yml
+
+- name: A check-mode run writes the runner cache into a directory that does not exist yet
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Create a scratch directory for this run
+      ansible.builtin.tempfile:
+        state: directory
+        suffix: inventory_resolve_cache
+      register: scratch
+      check_mode: false
+
+    - name: Create the file the download will have produced
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/fixtures/ansible_inventory.json"
+        dest: "{{ scratch.path }}/downloaded.json"
+        mode: "0600"
+      check_mode: false
+
+    - name: Resolve with the store appearing to answer, in check mode
+      ansible.builtin.include_role:
+        name: inventory_resolve
+      vars:
+        inventory_resolve_path: ""
+        inventory_resolve_openbao_addr: "http://127.0.0.1:1"
+        inventory_resolve_openbao_token: stub
+        inventory_resolve_openbao_validate_certs: false
+        inventory_resolve_object_storage:
+          secret:
+            S3_ENDPOINT: "http://127.0.0.1:1"
+            S3_ACCESS_KEY_ID: unreachable
+            S3_SECRET_ACCESS_KEY: unreachable
+            S3_REGION: us-east-1
+        inventory_resolve_s3_uri: "s3://iac-inventory/ansible_inventory.json"
+        inventory_resolve_s3_connect_timeout_seconds: 2
+        inventory_resolve_s3_read_timeout_seconds: 2
+        # Not created yet: the role must create it even under --check.
+        inventory_resolve_cache_dir: "{{ scratch.path }}/cache"
+        # Same stub as cache_fallback.yml: a path that already holds the
+        # artifact stands in for a completed store download.
+        inventory_resolve_tmp:
+          path: "{{ scratch.path }}/downloaded.json"
+
+    - name: Stat the cache file
+      ansible.builtin.stat:
+        path: "{{ scratch.path }}/cache/ansible_inventory.json"
+      register: cached
+      check_mode: false
+
+    - name: The cache file was written despite check mode
+      ansible.builtin.assert:
+        that:
+          - cached.stat.exists
+          - cached.stat.size > 0
+        fail_msg: check mode skipped or broke the runner cache write
