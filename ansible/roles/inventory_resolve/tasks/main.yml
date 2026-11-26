@@ -114,22 +114,23 @@
         access_key: "{{ inventory_resolve_object_storage.secret.S3_ACCESS_KEY_ID }}"
         secret_key: "{{ inventory_resolve_object_storage.secret.S3_SECRET_ACCESS_KEY }}"
         region: "{{ inventory_resolve_object_storage.secret.S3_REGION | default('us-east-1', true) }}"
+        aws_config:
+          connect_timeout: "{{ inventory_resolve_s3_connect_timeout_seconds | int }}"
+          read_timeout: "{{ inventory_resolve_s3_read_timeout_seconds | int }}"
+          retries:
+            max_attempts: 2
       register: inventory_resolve_s3_get
       changed_when: false
-      failed_when: false
-      # A store that accepts the connection but never answers must not hold the
-      # play open. The timeout kill is raised outside failed_when's evaluation,
-      # so ignore_errors is what turns it into a registered failure that the
-      # composed-reason fall-through below handles like any failed download.
+      # ignore_errors, not failed_when: false: ansible-core 2.19+ drops the module
+      # msg from a result whose failure failed_when suppresses, which left the
+      # download reason empty. ignore_errors keeps failed=true and the msg.
       ignore_errors: true
-      timeout: "{{ inventory_resolve_s3_timeout_seconds }}"
       check_mode: false
       no_log: true
       when: inventory_resolve_tmp.path is defined
 
-    # Same reasoning as the credential read above: the fall-through is wanted,
-    # the silence is not. A store that is unreachable, a bucket policy that
-    # denies, a renamed object — all currently look identical to "no creds".
+    # A failed or empty response still falls through to the runner cache; keep
+    # the module reason so the terminal failure can identify a store error.
     - name: Note why the download returned nothing
       ansible.builtin.set_fact:
         inventory_resolve_s3_error: >-

@@ -274,6 +274,12 @@ jobs:
         env:
           ANSIBLE_ROLES_PATH: ansible/roles
         run: ansible-playbook -i localhost, tests/inventory_resolve/cache_fallback.yml
+      - name: Verify inventory download failure reason within 30 seconds
+        env:
+          ANSIBLE_ROLES_PATH: ansible/roles
+        run: >-
+          timeout 30s ansible-playbook -i localhost,
+          tests/inventory_resolve/download_failure_reason.yml
       # The hook must keep the apps mechanism (first live cache wins, probe
       # retried, logged DIRECT fallback, hook registered for http AND https)
       # and the input must be a non-empty list of http(s) URLs. The real

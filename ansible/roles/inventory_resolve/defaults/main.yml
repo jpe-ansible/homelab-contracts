@@ -21,8 +21,10 @@ inventory_resolve_openbao_path: platform/object-storage
 inventory_resolve_openbao_validate_certs: true
 inventory_resolve_onprem_default_uri: "s3://iac-inventory/ansible_inventory.json"
 
-# Bounds the object-store download (Ansible task-level timeout)
-inventory_resolve_s3_timeout_seconds: 120
+# Maximum seconds to establish a connection to the object store.
+inventory_resolve_s3_connect_timeout_seconds: 10
+# Maximum seconds to wait for a response from the object store.
+inventory_resolve_s3_read_timeout_seconds: 60
 
 # Source 3: where this runner keeps the last successfully downloaded inventory.
 inventory_resolve_cache_dir: "{{ lookup('ansible.builtin.env', 'HOME') }}/.cache/inventory_resolve"

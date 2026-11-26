@@ -56,7 +56,8 @@
         S3_SECRET_ACCESS_KEY: unreachable
         S3_REGION: us-east-1
     inventory_resolve_s3_uri: "s3://iac-inventory/ansible_inventory.json"
-    inventory_resolve_s3_timeout_seconds: 15
+    inventory_resolve_s3_connect_timeout_seconds: 2
+    inventory_resolve_s3_read_timeout_seconds: 2
     # Named explicitly so the assertions below can reference the limit.
     inventory_resolve_cache_max_age_hours: 72
   tasks:
