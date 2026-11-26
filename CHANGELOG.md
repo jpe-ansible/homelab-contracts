@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Releases are managed automatically by [release-please](https://github.com/googleapis/release-please).
 
+## [5.78.1](https://github.com/jpe-ansible/homelab-contracts/compare/v5.78.0...v5.78.1) (2026-11-26)
+
+
+### Bug Fixes
+
+* **inventory_resolve:** bound the object-store inventory download ([#417](https://github.com/jpe-ansible/homelab-contracts/issues/417)) ([1d4b05e](https://github.com/jpe-ansible/homelab-contracts/commit/1d4b05ec7f03ebad7d0e4cb3de62d1c2ea421c89))
+
 ## [5.78.0](https://github.com/jpe-ansible/homelab-contracts/compare/v5.77.0...v5.78.0) (2026-11-26)
 
 
