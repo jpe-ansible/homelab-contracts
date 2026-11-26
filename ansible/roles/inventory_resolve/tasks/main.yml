@@ -147,10 +147,84 @@
       register: inventory_resolve_s3_stat
       when: inventory_resolve_tmp.path is defined
 
+    - name: Record the on-prem inventory candidate when the download succeeded
+      ansible.builtin.set_fact:
+        inventory_resolve_store_path: "{{ inventory_resolve_tmp.path }}"
+      when: (inventory_resolve_s3_stat.stat.size | default(0)) > 0
+
+    # --- source 3: this runner's last good download ------------------------------
+    # A store outage must not take every converge down with it, including the runs
+    # that would repair the store. This cache is NOT a statement about currency —
+    # the apply-owed detector below still runs on it, and fails open — only a way
+    # to keep working on the most recent inventory this runner actually downloaded.
+    - name: Fall back to this runner's cached inventory when the store did not resolve
+      vars:
+        inventory_resolve_cache_file: "{{ inventory_resolve_cache_dir }}/ansible_inventory.json"
+      when:
+        - inventory_resolve_store_path is not defined
+        - inventory_resolve_cache_path is not defined
+        - inventory_resolve_path | length == 0
+        - inventory_resolve_openbao_addr | length > 0
+        - inventory_resolve_openbao_token | length > 0
+      block:
+        - name: Stat the runner's cached inventory
+          ansible.builtin.stat:
+            path: "{{ inventory_resolve_cache_file }}"
+          register: inventory_resolve_cache_stat
+          changed_when: false
+          check_mode: false
+
+        - name: Read the controller clock to age the cached inventory
+          ansible.builtin.setup:
+            filter: ansible_date_time
+          register: inventory_resolve_clock
+          changed_when: false
+          check_mode: false
+          when: inventory_resolve_cache_stat.stat.exists | default(false)
+
+        - name: Compute the cached inventory's age in hours
+          ansible.builtin.set_fact:
+            inventory_resolve_cache_age_hours: >-
+              {{ ((inventory_resolve_clock.ansible_facts.ansible_date_time.epoch | int)
+                  - (inventory_resolve_cache_stat.stat.mtime | int)) / 3600 }}
+          when: inventory_resolve_cache_stat.stat.exists | default(false)
+
+        - name: Record the cached inventory candidate when it is fresh enough
+          ansible.builtin.set_fact:
+            inventory_resolve_cache_path: "{{ inventory_resolve_cache_file }}"
+          when:
+            - inventory_resolve_cache_stat.stat.exists | default(false)
+            - inventory_resolve_cache_age_hours | float <= inventory_resolve_cache_max_age_hours | float
+
+        - name: Note why the cached inventory was not used
+          ansible.builtin.set_fact:
+            inventory_resolve_cache_reason: >-
+              {{ 'cache missing — this runner has no successful store download on record'
+                 if not (inventory_resolve_cache_stat.stat.exists | default(false))
+                 else (inventory_resolve_cache_age_hours | float | round(1) ~ ' hours old — over the '
+                       ~ inventory_resolve_cache_max_age_hours ~ ' hour limit') }}
+          when: inventory_resolve_cache_path is not defined
+
     - name: Resolve inventory from the on-prem download when it succeeded
       ansible.builtin.set_fact: # noqa: var-naming[no-role-prefix] — contract fact
-        tofu_inventory_resolved: "{{ inventory_resolve_tmp.path }}"
-      when: (inventory_resolve_s3_stat.stat.size | default(0)) > 0
+        tofu_inventory_resolved: "{{ inventory_resolve_store_path | default(inventory_resolve_cache_path) }}"
+      when: inventory_resolve_store_path is defined or inventory_resolve_cache_path is defined
+
+# Outside the block on purpose: a block-level when is ANDed onto every task
+# inside it, and this announcement must run AFTER the resolution above has
+# defined the fact the block-level when checks the absence of. Equated against
+# the cache path so a store download that resolved before the block never
+# announces itself as a cache hit.
+- name: Say that the run is proceeding on the cached inventory
+  ansible.builtin.debug:
+    msg: >-
+      Object store unavailable — using this runner's cached inventory,
+      {{ inventory_resolve_cache_age_hours | float | round(1) }} hours old
+      (limit {{ inventory_resolve_cache_max_age_hours }} hours). Store error:
+      {{ inventory_resolve_s3_error | default(inventory_resolve_openbao_error | default('not determined'), true) }}
+  when:
+    - tofu_inventory_resolved is defined
+    - tofu_inventory_resolved == (inventory_resolve_cache_dir ~ '/ansible_inventory.json')
 
 # Composed separately from the failure message so the reason survives whether
 # the credential read, the download, or both are what went wrong.
@@ -175,6 +249,7 @@
       OpenTofu inventory could not be resolved from any source:
         1. TOFU_INVENTORY_PATH : {{ inventory_resolve_path | default('(unset)', true) }}
         2. published artifact  : {{ inventory_resolve_s3_effective | default('(no store creds / URI)', true) }}
+        3. runner cache        : {{ inventory_resolve_cache_reason | default('not attempted (TOFU_INVENTORY_PATH set, or store credentials absent)', true) }}
 
       What actually went wrong:
       {{ inventory_resolve_why | default('  (not determined)') }}
@@ -210,6 +285,31 @@
       re-run the producer Terrakube workspace so the inventory is republished.
   loop: "{{ inventory_resolve_required_keys }}"
   when: tofu_data is defined
+
+# --- keep the last good download on this runner ------------------------------
+# Only a store download that made it all the way through the role's validation
+# (parsed by include_vars, required keys asserted) becomes the next fallback,
+# so the cache can never hold something the role itself would have rejected.
+- name: Keep the last good store download on this runner
+  vars:
+    inventory_resolve_cache_file: "{{ inventory_resolve_cache_dir }}/ansible_inventory.json"
+  when:
+    - tofu_data is defined
+    - inventory_resolve_tmp.path is defined
+    - tofu_inventory_resolved == inventory_resolve_tmp.path
+  block:
+    - name: Create the inventory cache directory
+      ansible.builtin.file:
+        path: "{{ inventory_resolve_cache_dir }}"
+        state: directory
+        mode: "0700"
+
+    - name: Cache the downloaded inventory
+      ansible.builtin.copy:
+        src: "{{ inventory_resolve_tmp.path }}"
+        dest: "{{ inventory_resolve_cache_file }}"
+        remote_src: true
+        mode: "0600"
 
 # --- is an apply owed? ------------------------------------------------------
 #
