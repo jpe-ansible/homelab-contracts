@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Releases are managed automatically by [release-please](https://github.com/googleapis/release-please).
 
+## [5.79.0](https://github.com/jpe-ansible/homelab-contracts/compare/v5.78.1...v5.79.0) (2026-11-26)
+
+
+### Features
+
+* **inventory_resolve:** fall back to the last good inventory when the object store is down ([#420](https://github.com/jpe-ansible/homelab-contracts/issues/420)) ([99376fe](https://github.com/jpe-ansible/homelab-contracts/commit/99376fe4a727e58964b2539ac71a79ae191e94c0))
+
 ## [5.78.1](https://github.com/jpe-ansible/homelab-contracts/compare/v5.78.0...v5.78.1) (2026-11-26)
 
 
