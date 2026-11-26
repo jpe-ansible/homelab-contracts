@@ -117,6 +117,12 @@
       register: inventory_resolve_s3_get
       changed_when: false
       failed_when: false
+      # A store that accepts the connection but never answers must not hold the
+      # play open. The timeout kill is raised outside failed_when's evaluation,
+      # so ignore_errors is what turns it into a registered failure that the
+      # composed-reason fall-through below handles like any failed download.
+      ignore_errors: true
+      timeout: "{{ inventory_resolve_s3_timeout_seconds }}"
       check_mode: false
       no_log: true
       when: inventory_resolve_tmp.path is defined
