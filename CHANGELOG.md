@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Releases are managed automatically by [release-please](https://github.com/googleapis/release-please).
 
+## [5.79.1](https://github.com/jpe-ansible/homelab-contracts/compare/v5.79.0...v5.79.1) (2026-11-26)
+
+
+### Bug Fixes
+
+* **inventory_resolve:** keep the store download's failure reason and bound it with botocore timeouts ([#423](https://github.com/jpe-ansible/homelab-contracts/issues/423)) ([eeeb91a](https://github.com/jpe-ansible/homelab-contracts/commit/eeeb91ac24b59a509b371e6899bc228e57364af3))
+
 ## [5.79.0](https://github.com/jpe-ansible/homelab-contracts/compare/v5.78.1...v5.79.0) (2026-11-26)
 
 
