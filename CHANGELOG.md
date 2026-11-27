@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Releases are managed automatically by [release-please](https://github.com/googleapis/release-please).
 
+## [5.79.3](https://github.com/jpe-ansible/homelab-contracts/compare/v5.79.2...v5.79.3) (2026-11-27)
+
+
+### Bug Fixes
+
+* **docker_engine:** keep the Docker apt repository entry on one line ([#427](https://github.com/jpe-ansible/homelab-contracts/issues/427)) ([0eecaed](https://github.com/jpe-ansible/homelab-contracts/commit/0eecaed0779f062f8654b77777ce9d2ba6d3beb7))
+
 ## [5.79.2](https://github.com/jpe-ansible/homelab-contracts/compare/v5.79.1...v5.79.2) (2026-11-26)
 
 
